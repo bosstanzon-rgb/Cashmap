@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Linking } from "react-native";
 import { ActivityIndicator, Alert, Linking, Platform, ScrollView, Share, Text, TextInput, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
