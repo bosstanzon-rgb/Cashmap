@@ -1,0 +1,71 @@
+{
+  "expo": {
+    "name": "CashMap",
+    "slug": "cashmap",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0A"
+    },
+    "android": {
+      "package": "com.cashmap.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBu-paEC0P4aIJ6jTfw9yAaShSwTXcuMvE"
+        }
+      },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png",
+        "backgroundColor": "#0A0A0A"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.cashmap.app",
+      "buildNumber": "1.0.0"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "CashMap needs your location to track km for tax deductions and show live demand zones near you.",
+          "locationAlwaysPermission": "CashMap tracks your km in the background while you drive. This is used only for mileage logging and zone data \u2014 never sold or shared personally.",
+          "locationWhenInUsePermission": "CashMap needs your location to show nearby demand zones.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      "expo-notifications",
+      "expo-updates"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "288ac9b8-2435-43df-b685-c4c71b2c7c33"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/288ac9b8-2435-43df-b685-c4c71b2c7c33",
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "userInterfaceStyle": "dark"
+  }
+}
