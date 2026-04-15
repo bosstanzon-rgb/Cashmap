@@ -357,7 +357,7 @@ export const EarningsDashboardScreen = () => {
           )}
         </PremiumPressable>
       </View>
-
+      </View>
       <OfflineBanner />
       <MvpDisclaimerBanner className="mt-4" />
 
