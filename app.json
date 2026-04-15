@@ -40,7 +40,7 @@
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "CashMap needs your location to track km for tax deductions and show live demand zones near you.",
-          "locationAlwaysPermission": "CashMap tracks your km in the background while you drive. This is used only for mileage logging and zone data \u2014 never sold or shared personally.",
+          "locationAlwaysPermission": "CashMap tracks your km in the background while you drive. This is used only for mileage logging and zone data — never sold or shared personally.",
           "locationWhenInUsePermission": "CashMap needs your location to show nearby demand zones.",
           "isAndroidBackgroundLocationEnabled": true,
           "isAndroidForegroundServiceEnabled": true
@@ -66,6 +66,7 @@
     "runtimeVersion": {
       "policy": "appVersion"
     },
-    "userInterfaceStyle": "dark"
+    "userInterfaceStyle": "dark",
+    "scheme": "cashmap"
   }
 }
