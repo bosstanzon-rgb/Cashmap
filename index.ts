@@ -1,4 +1,4 @@
-import 'core-js/stable/weak-ref';
+import 'core-js/actual/weak-ref';
 import { registerRootComponent } from 'expo';
 
 import App from './App';
