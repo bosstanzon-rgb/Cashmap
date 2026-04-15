@@ -1,9 +1,12 @@
-import 'core-js/actual/weak-ref';
-import { registerRootComponent } from 'expo';
-
-import App from './App';
-
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
-registerRootComponent(App);
+// WeakRef polyfill for older Hermes builds
+if (typeof WeakRef === 'undefined') {
+    (global as any).WeakRef = class WeakRef {
+      private _target: any;
+      constructor(target: any) { this._target = target; }
+      deref() { return this._target; }
+    };
+  }
+  
+  import { registerRootComponent } from 'expo';
+  import App from './App';
+  registerRootComponent(App);
