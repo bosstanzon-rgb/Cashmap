@@ -26,7 +26,7 @@ export function GlassCard({ children, className = "", contentClassName = "p-6" }
     >
       <BlurView intensity={blur} tint="dark" style={StyleSheet.absoluteFillObject} />
       <View
-        className={`relative rounded-3xl border border-white/[0.06] bg-[#111111]/88 ${contentClassName}`}
+        className={`relative rounded-3xl border border-white/[0.06] bg-cm-surface/90 ${contentClassName}`}
       >
         {children}
       </View>

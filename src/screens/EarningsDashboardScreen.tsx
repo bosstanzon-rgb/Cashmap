@@ -338,7 +338,7 @@ export const EarningsDashboardScreen = () => {
         </View>
         <View className="flex-1 mt-2">
           <Text className="text-[13px] leading-5 text-cm-ink-secondary">Your earnings, km tracked, and shift history — all in one place. Export your km log for tax deductions anytime.</Text>
-]        </View>
+        </View>
         <PremiumPressable
           variant={refreshing ? "none" : "secondaryAccent"}
           className={

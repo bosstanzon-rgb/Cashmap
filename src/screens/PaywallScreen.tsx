@@ -21,7 +21,6 @@ import { DisclaimerFooter } from "@/components/DisclaimerFooter";
 import { PremiumPressable } from "@/components/PremiumPressable";
 import { BTN_PRIMARY_TEXT } from "@/constants/buttonStyles";
 import { CM } from "@/constants/theme";
-import { getRevenueCatPublicKey } from "@/config/env";
 
 const getFallbackPrices = (marketCode: string) => {
   if (marketCode === "ZA") return { monthly: "R59", yearly: "R499", lifetime: "R999" };
@@ -69,9 +68,9 @@ export const PaywallScreen = () => {
           if (l) setLifetimePrice(l);
         } catch (e) {
           if (!cancelled) {
-            setMonthlyPrice(FALLBACK_MONTHLY);
-            setYearlyPrice(FALLBACK_YEARLY);
-            setLifetimePrice(FALLBACK_LIFETIME);
+            setMonthlyPrice(fallback.monthly);
+            setYearlyPrice(fallback.yearly);
+            setLifetimePrice(fallback.lifetime);
             // Always show user-friendly message, never technical "not configured" errors
             const msg = e instanceof Error
               ? e.message

@@ -103,7 +103,14 @@ export const MARKETS: Record<string, MarketConfig> = {
     defaultCenter: { lat: -33.9249, lng: 18.4241 },
     primaryPlatforms: ["Mr D", "Uber Eats", "Bolt (Delivery)"],
     allPlatforms: GLOBAL_DELIVERY_PLATFORMS,
-    platformLinks: {},
+    platformLinks: {
+      "Mr D": "https://www.mrdfood.com",
+      "Uber Eats": "https://www.uber.com/za/en/eats/",
+      "Bolt (Delivery)": "https://bolt.eu/food/",
+      "Uber Driver (Rides)": "https://www.uber.com/za/en/drive/",
+      "InDrive": "https://indrive.com/",
+      "Other local apps": "https://www.google.com",
+    },
     defaultSuburbs: ["Cape Town CBD", "Waterfront", "Sea Point", "Claremont", "Bellville", "Brackenfell"],
   },
   ZA_DBN: {
@@ -115,7 +122,14 @@ export const MARKETS: Record<string, MarketConfig> = {
     defaultCenter: { lat: -29.8579, lng: 31.0292 },
     primaryPlatforms: ["Mr D", "Uber Eats", "Bolt (Delivery)"],
     allPlatforms: GLOBAL_DELIVERY_PLATFORMS,
-    platformLinks: {},
+    platformLinks: {
+      "Mr D": "https://www.mrdfood.com",
+      "Uber Eats": "https://www.uber.com/za/en/eats/",
+      "Bolt (Delivery)": "https://bolt.eu/food/",
+      "Uber Driver (Rides)": "https://www.uber.com/za/en/drive/",
+      "InDrive": "https://indrive.com/",
+      "Other local apps": "https://www.google.com",
+    },
     defaultSuburbs: ["Durban CBD", "Umhlanga", "Westville", "Pinetown", "Morningside"],
   },
   ZA_PTA: {
@@ -127,7 +141,14 @@ export const MARKETS: Record<string, MarketConfig> = {
     defaultCenter: { lat: -25.7479, lng: 28.2293 },
     primaryPlatforms: ["Mr D", "Uber Eats", "Bolt (Delivery)"],
     allPlatforms: GLOBAL_DELIVERY_PLATFORMS,
-    platformLinks: {},
+    platformLinks: {
+      "Mr D": "https://www.mrdfood.com",
+      "Uber Eats": "https://www.uber.com/za/en/eats/",
+      "Bolt (Delivery)": "https://bolt.eu/food/",
+      "Uber Driver (Rides)": "https://www.uber.com/za/en/drive/",
+      "InDrive": "https://indrive.com/",
+      "Other local apps": "https://www.google.com",
+    },
     defaultSuburbs: ["Pretoria CBD", "Hatfield", "Menlyn", "Centurion", "Brooklyn", "Arcadia"],
   },
   NG: {
@@ -139,7 +160,14 @@ export const MARKETS: Record<string, MarketConfig> = {
     defaultCenter: { lat: 6.5244, lng: 3.3792 },
     primaryPlatforms: ["Bolt (Delivery)", "Glovo", "Chowdeck"],
     allPlatforms: ["Bolt (Delivery)", "Glovo", "Chowdeck", "Uber Eats", "DoorDash", "Other local apps"],
-    platformLinks: {},
+    platformLinks: {
+      "Bolt (Delivery)": "https://bolt.eu/food/",
+      "Glovo": "https://glovoapp.com/ng/en/lagos/",
+      "Chowdeck": "https://chowdeck.com/",
+      "Uber Eats": "https://www.uber.com/ng/en/eats/",
+      "DoorDash": "https://www.doordash.com/dasher/",
+      "Other local apps": "https://www.google.com",
+    },
     defaultSuburbs: ["Victoria Island", "Lekki", "Ikeja", "Surulere", "Yaba"],
   },
   KE: {
@@ -151,7 +179,12 @@ export const MARKETS: Record<string, MarketConfig> = {
     defaultCenter: { lat: -1.2921, lng: 36.8219 },
     primaryPlatforms: ["Glovo", "Bolt (Delivery)", "Uber Eats"],
     allPlatforms: ["Glovo", "Bolt (Delivery)", "Uber Eats", "Other local apps"],
-    platformLinks: {},
+    platformLinks: {
+      "Glovo": "https://glovoapp.com/ke/en/nairobi/",
+      "Bolt (Delivery)": "https://bolt.eu/food/",
+      "Uber Eats": "https://www.uber.com/ke/en/eats/",
+      "Other local apps": "https://www.google.com",
+    },
     defaultSuburbs: ["Westlands", "CBD Nairobi", "Kilimani", "Karen", "Parklands"],
   },
   GH: {
@@ -163,7 +196,12 @@ export const MARKETS: Record<string, MarketConfig> = {
     defaultCenter: { lat: 5.5502, lng: -0.2174 },
     primaryPlatforms: ["Glovo", "Bolt (Delivery)"],
     allPlatforms: ["Glovo", "Bolt (Delivery)", "Uber Eats", "Other local apps"],
-    platformLinks: {},
+    platformLinks: {
+      "Glovo": "https://glovoapp.com/gh/en/accra/",
+      "Bolt (Delivery)": "https://bolt.eu/food/",
+      "Uber Eats": "https://www.uber.com/gh/en/eats/",
+      "Other local apps": "https://www.google.com",
+    },
     defaultSuburbs: ["Accra CBD", "East Legon", "Osu", "Airport Hills", "Tema"],
   },
   US: {

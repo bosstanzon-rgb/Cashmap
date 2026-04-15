@@ -28,3 +28,7 @@ export const APP_SWITCH_TIPS_ENABLED_KEY = "app-switch-tips-enabled";
 export const ACTIVE_SERVICE_MODES_KEY = "active-service-modes";
 /** Mirrored from `proStore` `isPro` for background mileage task. */
 export const IS_PRO_STORAGE_KEY = "is-pro";
+/** ISO timestamp of last background zone alert — prevents spam. */
+export const LAST_ZONE_ALERT_AT_KEY = "last-zone-alert-at";
+/** Last zone ID that triggered a background alert — prevents duplicate alerts for same zone. */
+export const LAST_ZONE_ALERT_ID_KEY = "last-zone-alert-id";

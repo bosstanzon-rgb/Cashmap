@@ -166,7 +166,7 @@ export const PredictionsScreen = () => {
                 variant="none"
                 onPress={openPaywall}
                 className={`mt-3 min-h-14 justify-center rounded-xl border px-4 py-3 ${
-                  row.key === drivingRank.ranked[0]?.key ? "border-cm-accent/30 bg-cm-raised" : "border-white/8 bg-cm-raised/60"
+                  row.key === drivingRank.ranked[0]?.key ? "border-cm-accent/30 bg-cm-raised" : "border-white/10 bg-cm-raised/60"
                 }`}
               >
                 <Text className="text-[13px] font-semibold leading-5 text-cm-ink">
@@ -224,7 +224,7 @@ export const PredictionsScreen = () => {
         <PremiumPressable
           variant="none"
           onPress={openPaywall}
-          className="mt-5 mb-8 min-h-16 w-full justify-center rounded-[28px] border-[1.5px] border-white/12 bg-cm-raised/90 p-6 shadow-cm-card"
+          className="mt-5 mb-8 min-h-16 w-full justify-center rounded-[28px] border-[1.5px] border-white/10 bg-cm-raised/90 p-6 shadow-cm-card"
         >
           <Text className="text-center text-[17px] font-bold text-cm-ink">{t("predictionsBenchmarksLockedTitle", languageCode)}</Text>
           <Text className="mt-2 text-center text-[14px] leading-6 text-cm-ink-secondary">{t("predictionsBenchmarksLockedBody", languageCode)}</Text>

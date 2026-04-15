@@ -46,7 +46,7 @@ export const WelcomeScreen = ({ navigation }: Props) => {
             { icon: "🔥", title: "Find hot zones", body: "See live demand heatmaps across the city. Green = high orders, cyan = predicted surge zones." },
             { icon: "💰", title: "Log your earnings", body: "After each shift, log your earnings. CashMap builds your weekly income history automatically." },
           ].map((item) => (
-            <View key={item.title} className="flex-row items-start gap-3 rounded-xl border border-white/8 bg-cm-raised px-4 py-3">
+            <View key={item.title} className="flex-row items-start gap-3 rounded-xl border border-white/10 bg-cm-raised px-4 py-3">
               <Text className="text-[22px]">{item.icon}</Text>
               <View className="flex-1">
                 <Text className="text-[14px] font-bold text-cm-ink">{item.title}</Text>

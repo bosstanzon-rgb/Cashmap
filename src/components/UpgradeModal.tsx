@@ -20,7 +20,6 @@ import { PremiumPressable } from "@/components/PremiumPressable";
 import { BTN_PRIMARY_TEXT } from "@/constants/buttonStyles";
 import { showErrorAlert, showSuccessToast } from "@/lib/appToasts";
 import { CM } from "@/constants/theme";
-import { getRevenueCatPublicKey } from "@/config/env";
 
 const BENEFITS = [
   "See exact driver counts in every zone — know when it's worth moving",
@@ -67,10 +66,8 @@ export const UpgradeModal = () => {
       setYearlyLabel(y ? `${y}/year (save 30%)` : fallbacks.yearly);
       setLifetimeLabel(l ? `${l} once-off` : fallbacks.lifetime);
     } catch (e) {
-      const hasKey = Boolean(getRevenueCatPublicKey());
       const msg = mapPurchasesError(e, "");
       setOfferingsError(
-        // Never show technical "not configured" messages to users
         msg || "Could not load subscription prices. Check your connection and try again."
       );
       setMonthlyLabel(fallbacks.monthly);

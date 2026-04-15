@@ -140,6 +140,7 @@ export const HomeScreen = () => {
     getTopZoneForPlatform,
     getTopZoneForSegment,
     refresh: refreshZoneAdvice,
+    lastUpdated,
   } = useZoneAdvice({ selectedPlatform, location: currentLocation, marketCode });
 
   useEffect(() => {
@@ -829,7 +830,7 @@ export const HomeScreen = () => {
         ) : (
           <PremiumPressable
             variant="none"
-            className="mt-2 w-full min-h-16 justify-center rounded-[28px] border-[1.5px] border-white/12 bg-cm-raised/60 px-5 py-4"
+            className="mt-2 w-full min-h-16 justify-center rounded-[28px] border-[1.5px] border-white/10 bg-cm-raised/60 px-5 py-4"
             onPress={() => openUpgradeModal()}
           >
             <Text className="text-center text-[18px] font-bold leading-6 text-cm-ink">

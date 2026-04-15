@@ -16,17 +16,22 @@ import {
   HEATMAP_SHARE_STORAGE_KEY,
   LOCATION_CONSENT_STORAGE_KEY,
   IS_WORKING_STORAGE_KEY,
+  IS_PRO_STORAGE_KEY,
   LAST_MILEAGE_LOCATION_STORAGE_KEY,
+  LAST_ZONE_ALERT_AT_KEY,
+  LAST_ZONE_ALERT_ID_KEY,
   SHIFT_LAST_MOVEMENT_AT_KEY,
   SHIFT_PROMPT_PENDING_KEY,
   SHIFT_PROMPT_SNOOZE_DATE_KEY,
   SHIFT_PROMPT_SHOWN_DATE_KEY,
   TOTAL_MILEAGE_STORAGE_KEY,
   WORKING_DATE_STORAGE_KEY,
+  ZONE_ALERTS_ENABLED_KEY,
 } from "@/constants/storage";
 import { getPersistedLanguageCode, t } from "@/constants/i18n";
-import { insertAnonymousLocationPing, insertMileageLog, isSupabaseConfigured } from "@/services/supabase";
-import { distanceKm } from "@/lib/geo";
+import { insertAnonymousLocationPing, insertMileageLog, isSupabaseConfigured, fetchRecentLocationPings } from "@/services/supabase";
+import { distanceKm, getSuburbName } from "@/lib/geo";
+import * as Notifications from "expo-notifications";
 import { scheduleAppAlert } from "@/services/alerts";
 
 export const BACKGROUND_LOCATION_TASK = "background-location-task";
@@ -35,6 +40,123 @@ export const BACKGROUND_LOCATION_PERMISSION_ERROR = "BACKGROUND_LOCATION_PERMISS
 export const LOCATION_CONSENT_REQUIRED = "LOCATION_CONSENT_REQUIRED";
 // "Shift likely ended" detection: user has been stationary for ~25+ minutes.
 const STATIONARY_THRESHOLD_MS = 25 * 60 * 1000;
+
+// ─── Background zone alert ────────────────────────────────────────────────────
+// Runs inside BACKGROUND_MILEAGE_TASK every ~5 min (throttled).
+// Fetches recent community pings near the driver, scores zones, and fires a
+// local notification if a high-demand zone is nearby — even while the driver
+// is using another app.
+
+const ZONE_CHECK_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+const ZONE_ALERT_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes between alerts
+const ZONE_SCORE_THRESHOLD = 7.5; // minimum score to trigger alert
+
+const checkAndAlertHotZone = async (
+  current: { lat: number; lng: number },
+  activePlatforms: string[],
+  lang: string
+) => {
+  try {
+    // Throttle: only check once every 5 minutes
+    const lastCheckRaw = await AsyncStorage.getItem(LAST_ZONE_ALERT_AT_KEY);
+    if (lastCheckRaw) {
+      const elapsed = Date.now() - Number(lastCheckRaw);
+      if (elapsed < ZONE_CHECK_INTERVAL_MS) return;
+    }
+
+    // Only alert if zone alerts are enabled
+    const alertsEnabled = (await AsyncStorage.getItem(ZONE_ALERTS_ENABLED_KEY)) !== "false";
+    if (!alertsEnabled) return;
+
+    // Only Pro users get background zone alerts
+    const isPro = (await AsyncStorage.getItem(IS_PRO_STORAGE_KEY)) === "true";
+    if (!isPro) return;
+
+    if (!isSupabaseConfigured()) return;
+
+    // Mark check time before fetching to prevent overlapping calls
+    await AsyncStorage.setItem(LAST_ZONE_ALERT_AT_KEY, String(Date.now()));
+
+    const sinceIso = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const delta = 0.08;
+    const pings = await fetchRecentLocationPings({
+      sinceIso,
+      minLat: current.lat - delta,
+      maxLat: current.lat + delta,
+      minLng: current.lng - delta,
+      maxLng: current.lng + delta,
+    });
+
+    if (pings.length === 0) return;
+
+    // Score zones same way as useZoneAdvice
+    const hour = new Date().getHours();
+    const timeFactor = hour >= 18 && hour <= 22 ? 1.5 : hour >= 12 && hour <= 14 ? 1.3 : 1;
+    const grouped = new Map<string, { lat: number; lng: number; demand: number; drivers: Set<string>; platform: string }>();
+
+    for (const ping of pings) {
+      if (distanceKm(current, { lat: ping.lat, lng: ping.lng }) > 5) continue;
+      for (const platform of (ping.active_platforms ?? [])) {
+        if (!activePlatforms.includes(platform)) continue;
+        const latCell = Math.round(ping.lat * 100) / 100;
+        const lngCell = Math.round(ping.lng * 100) / 100;
+        const key = `${platform}:${latCell}:${lngCell}`;
+        const row = grouped.get(key) ?? { lat: latCell, lng: lngCell, demand: 0, drivers: new Set<string>(), platform };
+        row.demand += 1;
+        row.drivers.add(`${Math.round(ping.lat * 250)}:${Math.round(ping.lng * 250)}`);
+        grouped.set(key, row);
+      }
+    }
+
+    if (grouped.size === 0) return;
+
+    // Find best zone
+    let bestId = "";
+    let bestScore = 0;
+    let bestLat = 0;
+    let bestLng = 0;
+    let bestPlatform = "";
+
+    for (const [id, row] of grouped.entries()) {
+      const score = (row.demand / (row.drivers.size + 1)) * timeFactor;
+      if (score > bestScore) {
+        bestScore = score;
+        bestId = id;
+        bestLat = row.lat;
+        bestLng = row.lng;
+        bestPlatform = row.platform;
+      }
+    }
+
+    if (bestScore < ZONE_SCORE_THRESHOLD) return;
+
+    // Cooldown: don't re-alert same zone within 15 minutes
+    const lastAlertId = await AsyncStorage.getItem(LAST_ZONE_ALERT_ID_KEY);
+    const lastAlertAt = await AsyncStorage.getItem(LAST_ZONE_ALERT_AT_KEY);
+    if (lastAlertId === bestId && lastAlertAt) {
+      if (Date.now() - Number(lastAlertAt) < ZONE_ALERT_COOLDOWN_MS) return;
+    }
+
+    // Get suburb name using distance-based lookup
+    const suburb = getSuburbName(bestLat, bestLng, "nearby");
+
+    // Fire the notification
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: t("notifyGoldenZoneTitle", lang, { suburb }),
+        body: t("notifyGoldenZoneBody", lang),
+        categoryIdentifier: "ZONE_ALERTS_CATEGORY",
+        data: { targetTab: "HomeMap", platform: bestPlatform },
+      },
+      trigger: null,
+    });
+
+    await AsyncStorage.setItem(LAST_ZONE_ALERT_ID_KEY, bestId);
+    await AsyncStorage.setItem(LAST_ZONE_ALERT_AT_KEY, String(Date.now()));
+  } catch {
+    // Zone check failures must never crash the background task
+  }
+};
 
 TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
   if (error || !data) return;
@@ -156,7 +278,16 @@ TaskManager.defineTask(BACKGROUND_MILEAGE_TASK, async ({ data, error }) => {
     }
   }
   await AsyncStorage.setItem(LAST_MILEAGE_LOCATION_STORAGE_KEY, JSON.stringify(current));
+
+  // Background zone alert — check for hot zones near driver every 5 min
+  const bgPlatformsRaw = await AsyncStorage.getItem(ACTIVE_PLATFORMS_STORAGE_KEY);
+  const bgPlatforms = bgPlatformsRaw ? (JSON.parse(bgPlatformsRaw) as string[]) : [];
+  if (bgPlatforms.length > 0) {
+    const bgLang = await getPersistedLanguageCode();
+    void checkAndAlertHotZone(current, bgPlatforms, bgLang);
+  }
 });
+
 
 export const startBackgroundLocationTracking = async () => {
   const reg = await TaskManager.isTaskRegisteredAsync(BACKGROUND_LOCATION_TASK);

@@ -1,6 +1,6 @@
-import { View } from "react-native";
+import { View, Text } from "react-native";
 
-/** Single row for Victory — y-values normalized 0–100 so earnings + km share one axis. */
+/** Single row for the chart — y-values normalized 0–100 so earnings + km share one axis. */
 export type WeeklyChartDatum = {
   i: number;
   dayLabel: string;
@@ -10,56 +10,88 @@ export type WeeklyChartDatum = {
 
 type Props = {
   data: WeeklyChartDatum[];
-  /** Chart canvas height (labels live outside in parent). */
   height?: number;
 };
 
 /**
- * Weekly bar chart fallback using plain RN views (stable across Android builds).
- * Green = earnings index, teal = km index (same 0–100 scale).
+ * Modern vertical grouped bar chart.
+ * Green = earnings index, cyan = km index (both 0–100 scale).
  */
 export function WeeklyEarningsVictoryChart({ data, height = 200 }: Props) {
   if (data.length === 0) return null;
 
   const bars = data.slice(0, 7);
-  const rowHeight = Math.max(14, Math.floor((height - 16) / bars.length));
+  const chartHeight = height - 28;
 
   return (
-    <View style={{ height, width: "100%", gap: 4, paddingTop: 4 }}>
-      {bars.map((d) => {
-        const eFlex = Math.max(0.02, Math.min(1, d.e / 100));
-        const kFlex = Math.max(0.02, Math.min(1, d.k / 100));
-        return (
-          <View key={d.i} style={{ height: rowHeight, flexDirection: "row", alignItems: "center", gap: 8 }}>
+    <View style={{ height, width: "100%", paddingTop: 8 }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          height: chartHeight,
+          paddingHorizontal: 2,
+        }}
+      >
+        {bars.map((d) => {
+          const eH = Math.max(4, (d.e / 100) * chartHeight);
+          const kH = Math.max(4, (d.k / 100) * chartHeight);
+          const isToday = d.i === bars.length - 1;
+          return (
             <View
+              key={d.i}
               style={{
                 flex: 1,
-                height: Math.max(8, rowHeight - 4),
-                borderRadius: 999,
-                backgroundColor: "#242424",
-                overflow: "hidden",
-                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                height: chartHeight,
+                marginHorizontal: 2,
               }}
             >
-              <View style={{ flex: eFlex, backgroundColor: "rgba(0, 255, 157, 0.9)", borderRadius: 999 }} />
-              <View style={{ flex: Math.max(0.02, 1 - eFlex) }} />
+              <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 2, width: "100%", justifyContent: "center" }}>
+                <View
+                  style={{
+                    flex: 1,
+                    height: eH,
+                    borderRadius: 4,
+                    backgroundColor: isToday ? "rgba(0,255,157,1)" : "rgba(0,255,157,0.65)",
+                    shadowColor: "#00FF9D",
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: isToday ? 0.7 : 0,
+                    shadowRadius: 10,
+                    elevation: isToday ? 4 : 0,
+                  }}
+                />
+                <View
+                  style={{
+                    flex: 1,
+                    height: kH,
+                    borderRadius: 4,
+                    backgroundColor: isToday ? "rgba(0,229,255,1)" : "rgba(0,229,255,0.55)",
+                    shadowColor: "#00E5FF",
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: isToday ? 0.6 : 0,
+                    shadowRadius: 10,
+                    elevation: isToday ? 3 : 0,
+                  }}
+                />
+              </View>
             </View>
-            <View
-              style={{
-                flex: 1,
-                height: Math.max(8, rowHeight - 4),
-                borderRadius: 999,
-                backgroundColor: "#242424",
-                overflow: "hidden",
-                flexDirection: "row",
-              }}
-            >
-              <View style={{ flex: kFlex, backgroundColor: "rgba(0, 229, 255, 0.88)", borderRadius: 999 }} />
-              <View style={{ flex: Math.max(0.02, 1 - kFlex) }} />
-            </View>
-          </View>
-        );
-      })}
+          );
+        })}
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 16, marginTop: 10 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+          <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: "rgba(0,255,157,0.9)" }} />
+          <Text style={{ fontSize: 11, color: "#AAAAAA" }}>Earnings</Text>
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+          <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: "rgba(0,229,255,0.85)" }} />
+          <Text style={{ fontSize: 11, color: "#AAAAAA" }}>Km driven</Text>
+        </View>
+      </View>
     </View>
   );
 }
