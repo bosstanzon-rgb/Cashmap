@@ -396,6 +396,32 @@ export const HomeScreen = () => {
     }, 600);
   };
 
+  // Best zone coords for "Guide Me There" — realtime first, then predicted
+  const bestZoneCoords = useMemo(() => {
+    const best = [...realtimeZones].sort((a, b) => b.score - a.score)[0]
+      ?? [...allPredictedZones].sort((a, b) => b.predictedScore - a.predictedScore)[0];
+    if (!best) return null;
+    return {
+      lat: best.centerLat,
+      lng: best.centerLng,
+      suburb: best.suburb,
+    };
+  }, [realtimeZones, allPredictedZones]);
+
+  const openGoogleMapsNav = () => {
+    if (!bestZoneCoords) return;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${bestZoneCoords.lat},${bestZoneCoords.lng}&travelmode=driving`;
+    void Linking.openURL(url);
+  };
+
+  const openWazeNav = () => {
+    if (!bestZoneCoords) return;
+    const url = `https://waze.com/ul?ll=${bestZoneCoords.lat},${bestZoneCoords.lng}&navigate=yes`;
+    void Linking.openURL(url);
+  };
+
+  const [showNavOptions, setShowNavOptions] = useState(false);
+
   return (
     <View style={{ flex: 1, backgroundColor: CM.canvas }}>
 
@@ -773,6 +799,111 @@ export const HomeScreen = () => {
           {t("acceptHighestPayout", languageCode, { platform: bestNow.displayName })}
         </Text>
       </PremiumPressable>
+
+      {/* ── Guide Me There button — shows when there is a hot zone ── */}
+      {bestZoneCoords ? (
+        <View
+          style={{
+            position: "absolute",
+            bottom: SHEET_PEEK + 72,
+            left: 16,
+            right: 72,
+            zIndex: 20,
+          }}
+        >
+          {showNavOptions ? (
+            <View style={{ gap: 8 }}>
+              {/* Waze option */}
+              <TouchableOpacity
+                onPress={() => { openWazeNav(); setShowNavOptions(false); }}
+                style={{
+                  backgroundColor: "rgba(10,10,10,0.92)",
+                  borderRadius: 999,
+                  paddingVertical: 12,
+                  paddingHorizontal: 20,
+                  borderWidth: 1,
+                  borderColor: "rgba(0,229,255,0.4)",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+              >
+                <Text style={{ fontSize: 16 }}>🔵</Text>
+                <Text style={{ color: "#00E5FF", fontSize: 14, fontWeight: "700" }}>
+                  Open in Waze
+                </Text>
+              </TouchableOpacity>
+              {/* Google Maps option */}
+              <TouchableOpacity
+                onPress={() => { openGoogleMapsNav(); setShowNavOptions(false); }}
+                style={{
+                  backgroundColor: "rgba(0,255,157,1)",
+                  borderRadius: 999,
+                  paddingVertical: 16,
+                  paddingHorizontal: 24,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 10,
+                  shadowColor: "#00FF9D",
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.6,
+                  shadowRadius: 16,
+                  elevation: 12,
+                }}
+              >
+                <Text style={{ fontSize: 18 }}>🗺️</Text>
+                <View>
+                  <Text style={{ color: "#0A0A0A", fontSize: 16, fontWeight: "900", letterSpacing: 0.3 }}>
+                    Guide Me There
+                  </Text>
+                  <Text style={{ color: "rgba(0,0,0,0.6)", fontSize: 11, fontWeight: "600" }}>
+                    → {bestZoneCoords.suburb}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              {/* Dismiss */}
+              <TouchableOpacity
+                onPress={() => setShowNavOptions(false)}
+                style={{ alignItems: "center", paddingVertical: 4 }}
+              >
+                <Text style={{ color: "#666", fontSize: 12 }}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              onPress={() => setShowNavOptions(true)}
+              style={{
+                backgroundColor: "rgba(0,255,157,1)",
+                borderRadius: 999,
+                paddingVertical: 16,
+                paddingHorizontal: 24,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+                shadowColor: "#00FF9D",
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.55,
+                shadowRadius: 20,
+                elevation: 12,
+              }}
+            >
+              <Text style={{ fontSize: 20 }}>🔥</Text>
+              <View>
+                <Text style={{ color: "#0A0A0A", fontSize: 16, fontWeight: "900", letterSpacing: 0.3 }}>
+                  Guide Me There
+                </Text>
+                <Text style={{ color: "rgba(0,0,0,0.55)", fontSize: 11, fontWeight: "600" }}>
+                  Hot zone → {bestZoneCoords.suburb}
+                </Text>
+              </View>
+              <Text style={{ color: "rgba(0,0,0,0.4)", fontSize: 18, marginLeft: 4 }}>›</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      ) : null}
 
       {/* ── Shift logger modal ── */}
       <Modal visible={Boolean(pendingPrompt)} transparent animationType="slide">
