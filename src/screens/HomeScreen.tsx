@@ -31,6 +31,7 @@ import * as Notifications from "expo-notifications";
 import * as Battery from "expo-battery";
 import Constants from "expo-constants";
 import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import type { MapViewProps } from "react-native-maps";
 import { useRoute } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -91,6 +92,7 @@ export const HomeScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [mapRegion, setMapRegion] = useState<{ latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number } | null>(null);
+  const mapRef = useRef<MapView>(null);
   const [mapLegalOpen, setMapLegalOpen] = useState(false);
   const [toast, setToast] = useState<{ title: string; body: string; platform?: string; tierId?: string } | null>(null);
   const [pendingPrompt, setPendingPrompt] = useState<{ timestamp: string; lat: number; lng: number } | null>(null);
@@ -372,6 +374,29 @@ export const HomeScreen = () => {
     setPendingPrompt(null); setSummaryError(null); setEarnings(""); setDeliveries(0); setRating("Average");
   };
 
+  const goToBusiestZone = () => {
+    // Pick best zone: realtime first, then predicted
+    const best = realtimeZones.sort((a, b) => b.score - a.score)[0]
+      ?? allPredictedZones.sort((a, b) => b.predictedScore - a.predictedScore)[0];
+    if (!best) return;
+    mapRef.current?.animateToRegion({
+      latitude: best.centerLat,
+      longitude: best.centerLng,
+      latitudeDelta: 0.04,
+      longitudeDelta: 0.04,
+    }, 800);
+  };
+
+  const goToMyLocation = () => {
+    if (!currentLocation) return;
+    mapRef.current?.animateToRegion({
+      latitude: currentLocation.lat,
+      longitude: currentLocation.lng,
+      latitudeDelta: 0.06,
+      longitudeDelta: 0.06,
+    }, 600);
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: CM.canvas }}>
 
@@ -379,6 +404,7 @@ export const HomeScreen = () => {
       <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
         {hasGoogleMapsKey ? (
           <MapView
+            ref={mapRef}
             provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
             style={{ flex: 1 }}
             region={mapRegion ?? getDefaultRegion(market.defaultCenter)}
@@ -414,6 +440,41 @@ export const HomeScreen = () => {
                 strokeWidth={isPro ? 1.5 : 1}
               />
             ))}
+            {/* User location marker */}
+            {currentLocation ? (
+              <Marker
+                coordinate={{ latitude: currentLocation.lat, longitude: currentLocation.lng }}
+                anchor={{ x: 0.5, y: 0.5 }}
+                flat
+              >
+                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                  {/* Outer pulse ring */}
+                  <View style={{
+                    position: "absolute",
+                    width: 36,
+                    height: 36,
+                    borderRadius: 18,
+                    backgroundColor: "rgba(0,229,255,0.15)",
+                    borderWidth: 1,
+                    borderColor: "rgba(0,229,255,0.4)",
+                  }} />
+                  {/* Inner dot */}
+                  <View style={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: 7,
+                    backgroundColor: "#00E5FF",
+                    borderWidth: 2.5,
+                    borderColor: "#fff",
+                    shadowColor: "#00E5FF",
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.9,
+                    shadowRadius: 8,
+                    elevation: 8,
+                  }} />
+                </View>
+              </Marker>
+            ) : null}
           </MapView>
         ) : (
           <View style={{ flex: 1, backgroundColor: CM.raised, alignItems: "center", justifyContent: "center", padding: 24 }}>
@@ -422,6 +483,38 @@ export const HomeScreen = () => {
             <Text style={{ color: "#AAAAAA", fontSize: 13, marginTop: 8, textAlign: "center" }}>Add a Google Maps API key to show the live heatmap.</Text>
           </View>
         )}
+      </View>
+
+      {/* ── Map control buttons — float bottom-right of map ── */}
+      <View style={{ position: "absolute", right: 16, bottom: SHEET_PEEK + 16, zIndex: 15, gap: 10 }}>
+        {/* My location button */}
+        <TouchableOpacity
+          onPress={goToMyLocation}
+          style={{
+            width: 44, height: 44, borderRadius: 22,
+            backgroundColor: "rgba(10,10,10,0.88)",
+            borderWidth: 1, borderColor: "rgba(0,229,255,0.4)",
+            alignItems: "center", justifyContent: "center",
+            shadowColor: "#000", shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.4, shadowRadius: 8, elevation: 8,
+          }}
+        >
+          <Text style={{ fontSize: 18 }}>📍</Text>
+        </TouchableOpacity>
+        {/* Go to busiest zone button */}
+        <TouchableOpacity
+          onPress={goToBusiestZone}
+          style={{
+            width: 44, height: 44, borderRadius: 22,
+            backgroundColor: "rgba(10,10,10,0.88)",
+            borderWidth: 1, borderColor: "rgba(0,255,157,0.4)",
+            alignItems: "center", justifyContent: "center",
+            shadowColor: "#00FF9D", shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0.5, shadowRadius: 8, elevation: 8,
+          }}
+        >
+          <Text style={{ fontSize: 18 }}>🔥</Text>
+        </TouchableOpacity>
       </View>
 
       {/* ── TOP HUD — km pill + refresh ── */}
