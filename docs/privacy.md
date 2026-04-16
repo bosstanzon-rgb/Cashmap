@@ -1,26 +1,31 @@
-import { Linking, ScrollView, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { PRIVACY_POLICY_PLACEHOLDER, PRIVACY_POLICY_URL } from "@/constants/legal";
-import { PremiumPressable } from "@/components/PremiumPressable";
- 
-export const PrivacyPolicyScreen = () => {
-  const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
-  return (
-    <View className="flex-1 bg-cm-canvas px-5" style={{ paddingTop: Math.max(insets.top, 16) }}>
-      <PremiumPressable variant="secondary" className="mb-5 self-end px-8 shadow-cm-inner" onPress={() => navigation.goBack()}>
-        <Text className="text-center text-[15px] font-bold text-cm-ink">Close</Text>
-      </PremiumPressable>
-      <Text className="text-[11px] font-bold uppercase tracking-widest text-cm-accent">CashMap</Text>
-      <Text className="mt-2 text-3xl font-bold tracking-tight text-cm-ink">Privacy Policy</Text>
-      <PremiumPressable variant="none" className="mt-2 self-start" onPress={() => void Linking.openURL(PRIVACY_POLICY_URL)}>
-        <Text className="text-[12px] text-cm-accent underline">View latest version online →</Text>
-      </PremiumPressable>
-      <ScrollView className="mt-4 flex-1" contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
-        <Text className="text-[14px] leading-7 text-cm-ink-secondary">{PRIVACY_POLICY_PLACEHOLDER}</Text>
-      </ScrollView>
-    </View>
-  );
-};
- 
+# CashMap Privacy Policy
+
+Last updated: April 2026
+
+## Overview
+CashMap is a free community tool for gig drivers. We collect only what is necessary to provide the service and never sell your data.
+
+## What We Collect
+
+**1. Location data (opt-in only)**
+When you enable "Share anonymous data for heatmaps" in Settings, CashMap sends your GPS coordinates at approximately 1km precision. Coordinates are rounded before storage — your exact position is never saved. This data is automatically deleted after 7 days.
+
+**2. Mileage logs (private to your device)**
+When you use "I'm Working", CashMap tracks your km using GPS. Stored against an anonymous device ID only you can access. Used only for your personal tax export. Deleted after 365 days.
+
+**3. Shift logs (private + anonymised)**
+Your personal earnings are private. An anonymised version (suburb + platform + earnings, no name or ID) improves zone predictions for all drivers.
+
+## What We Do NOT Collect
+- Your name, email, phone number, or any personally identifiable information
+- Payment details (handled entirely by Google Play / RevenueCat)
+- Photos, contacts, or any unrelated data
+
+## Your Rights (POPIA / GDPR)
+- Opt out of location sharing anytime in Settings
+- Delete all local data: Settings → Reset CashMap
+- Request server-side deletion: support@cashmap.app
+- Export your data via CSV export on the Earnings screen
+
+## Contact
+support@cashmap.app
