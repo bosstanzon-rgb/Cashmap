@@ -60,12 +60,12 @@ import { CM, INPUT_PLACEHOLDER } from "@/constants/theme";
 import { getGoogleMapsApiKey } from "@/config/env";
 
 /** Default map camera — Johannesburg CBD (heatmap / Gauteng focus). */
-const JOHANNESBURG_REGION = {
-  latitude: -26.2041,
-  longitude: 28.0473,
+const getDefaultRegion = (center: { lat: number; lng: number }) => ({
+  latitude: center.lat,
+  longitude: center.lng,
   latitudeDelta: 0.14,
   longitudeDelta: 0.14,
-};
+});
 
 export const HomeScreen = () => {
   const insets = useSafeAreaInsets();
@@ -73,6 +73,7 @@ export const HomeScreen = () => {
   const [busy, setBusy] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [mapRegion, setMapRegion] = useState<{ latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number } | null>(null);
   const [toast, setToast] = useState<{
     title: string;
     body: string;
@@ -246,9 +247,14 @@ export const HomeScreen = () => {
         const loc = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
         });
-        setCurrentLocation({
-          lat: loc.coords.latitude,
-          lng: loc.coords.longitude,
+        const coords = { lat: loc.coords.latitude, lng: loc.coords.longitude };
+        setCurrentLocation(coords);
+        // Centre map on user's actual GPS position
+        setMapRegion({
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+          latitudeDelta: 0.1,
+          longitudeDelta: 0.1,
         });
       }
       await Promise.all([refreshZoneAdvice(), refreshPredictions(), checkShiftPrompt()]);
@@ -526,376 +532,374 @@ export const HomeScreen = () => {
         keyboardShouldPersistTaps="handled"
         nestedScrollEnabled={Platform.OS === "android"}
       >
-      <OfflineBanner />
-      <MvpDisclaimerBanner className="mb-4" />
 
-      <View className="mb-2 flex-row items-center justify-between">
-        <Text className="text-[12px] leading-4 text-cm-ink-tertiary">Select your platform to see live zone data for that app</Text>
-        {lastUpdated ? (
-          <Text className="text-[11px] text-cm-ink-tertiary">
-            Updated {new Date(lastUpdated).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+        {/* ── Offline banner ── */}
+        <OfflineBanner />
+
+        {/* ── Platform selector ── */}
+        <View className="mb-5 mt-2">
+          <Text className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-cm-ink-tertiary">
+            Your platforms
           </Text>
-        ) : null}
-      </View>
-      <View className="mb-4 flex-row gap-2 rounded-2xl border border-white/10 bg-cm-surface p-1.5">
-        {defaultPrimary.map((platform) => (
-          <PremiumPressable
-            key={platform}
-            variant="chip"
-            className={`flex-1 flex-row items-center justify-center gap-1 px-1 py-1 rounded-xl ${
-              selectedPlatform === platform ? "bg-cm-accent" : "bg-transparent"
-            }`}
-            onPress={() => setSelectedPlatform(platform)}
-          >
-            <PlatformGlyph name={platform} size="sm" />
-            <Text
-              numberOfLines={1}
-              className={`max-w-[80%] text-center text-[12px] font-bold ${
-                selectedPlatform === platform ? "text-cm-on-accent" : "text-cm-ink-secondary"
-              }`}
-            >
-              {platform}
-            </Text>
-          </PremiumPressable>
-        ))}
-      </View>
-
-      {/* Primary “I’m Working” control — starts background mileage task (Haversine) + optional heatmap pings */}
-      <View className="mb-4 rounded-2xl border border-white/10 bg-cm-surface p-5 shadow-cm-card">
-        <View className="mb-3 flex-row items-center justify-between">
-          <View>
-            <Text className="text-[13px] font-bold text-cm-ink">{isWorking ? "Shift in progress" : "Start your shift"}</Text>
-            <Text className="text-[11px] text-cm-ink-tertiary">{isWorking ? "Tracking active" : "Tap below to begin"}</Text>
-          </View>
-          <View className="items-end">
-            <Text className="text-[22px] font-bold tabular-nums text-cm-accent">{todayKm.toFixed(1)} km</Text>
-            <Text className="text-[10px] text-cm-ink-tertiary">today · {weeklyKm.toFixed(1)} km week</Text>
+          <View className="flex-row gap-2 rounded-2xl border border-white/10 bg-cm-surface p-1.5">
+            {defaultPrimary.map((platform) => (
+              <PremiumPressable
+                key={platform}
+                variant="chip"
+                className={`flex-1 flex-row items-center justify-center gap-1.5 rounded-xl px-2 py-2 ${
+                  selectedPlatform === platform ? "bg-cm-accent" : "bg-transparent"
+                }`}
+                onPress={() => setSelectedPlatform(platform)}
+              >
+                <PlatformGlyph name={platform} size="sm" />
+                <Text
+                  numberOfLines={1}
+                  className={`max-w-[80%] text-center text-[12px] font-bold ${
+                    selectedPlatform === platform ? "text-cm-on-accent" : "text-cm-ink-secondary"
+                  }`}
+                >
+                  {platform}
+                </Text>
+              </PremiumPressable>
+            ))}
           </View>
         </View>
-        <PremiumPressable
-          variant="hero"
-          className={`w-full ${busy ? "bg-cm-muted shadow-none" : isWorking ? "border-transparent bg-cm-accent shadow-cm-glow" : "border-[1.5px] border-white/10 bg-cm-raised shadow-cm-inner"}`}
-          onPress={() => void toggleWorking()}
-          disabled={busy || (!trackMileageWhenWorking && !isWorking)}
-        >
-          {busy ? (
-            <View className="flex-row items-center justify-center gap-3">
-              <ActivityIndicator color={CM.accent} />
-              <Text className="text-[18px] font-bold text-cm-ink-secondary">{t("updating", languageCode)}</Text>
+
+        {/* ── Shift control ── */}
+        <View className="mb-6 rounded-3xl border border-white/10 bg-cm-surface p-5 shadow-cm-card">
+          <View className="mb-4 flex-row items-center justify-between">
+            <View>
+              <Text className="text-[15px] font-bold text-cm-ink">
+                {isWorking ? "Shift in progress" : "Start your shift"}
+              </Text>
+              <Text className="mt-0.5 text-[12px] text-cm-ink-tertiary">
+                {isWorking ? "Mileage tracking active" : "Tap below to begin"}
+              </Text>
+            </View>
+            <View className="items-end">
+              <Text className="text-[24px] font-bold tabular-nums text-cm-accent">{todayKm.toFixed(1)} km</Text>
+              <Text className="text-[11px] text-cm-ink-tertiary">today · {weeklyKm.toFixed(1)} this week</Text>
+            </View>
+          </View>
+          <PremiumPressable
+            variant="hero"
+            className={`w-full ${busy ? "bg-cm-muted shadow-none" : isWorking ? "border-transparent bg-cm-accent shadow-cm-glow" : "border-[1.5px] border-white/10 bg-cm-raised shadow-cm-inner"}`}
+            onPress={() => void toggleWorking()}
+            disabled={busy || (!trackMileageWhenWorking && !isWorking)}
+          >
+            {busy ? (
+              <View className="flex-row items-center justify-center gap-3">
+                <ActivityIndicator color={CM.accent} />
+                <Text className="text-[18px] font-bold text-cm-ink-secondary">{t("updating", languageCode)}</Text>
+              </View>
+            ) : (
+              <View className="items-center py-1">
+                <Text className={`text-center text-[20px] font-bold tracking-tight ${isWorking ? "text-cm-on-accent" : "text-cm-ink"}`}>
+                  {isWorking ? t("trackingToggleOn", languageCode) : t("trackingToggleOff", languageCode)}
+                </Text>
+                <Text className={`mt-1 text-center text-[13px] leading-5 ${isWorking ? "text-cm-on-accent/80" : "text-cm-ink-secondary"}`}>
+                  {isWorking ? t("trackingToggleHintOn", languageCode) : t("trackingToggleHintOff", languageCode)}
+                </Text>
+              </View>
+            )}
+          </PremiumPressable>
+        </View>
+
+        {/* ── Best zone (while working) ── */}
+        {bestNow && isWorking ? (
+          <View className="mb-6 rounded-3xl border border-cm-accent/25 bg-cm-accent-soft p-5">
+            <Text className="text-[11px] font-bold uppercase tracking-widest text-cm-accent">Best zone right now</Text>
+            <View className="mt-3 flex-row items-center justify-between">
+              <View className="flex-1">
+                <Text className="text-[20px] font-bold text-cm-ink">{bestNow.suburb}</Text>
+                <Text className="mt-1 text-[13px] text-cm-ink-secondary">{bestNow.displayName}</Text>
+              </View>
+              {isPro ? (
+                <Text className="text-[22px] font-bold text-cm-accent">~{formatMoney(bestNow.est, marketCode)}/hr</Text>
+              ) : (
+                <PremiumPressable variant="none" className="rounded-full border border-cm-accent/40 bg-cm-canvas px-4 py-2" onPress={() => openUpgradeModal()}>
+                  <Text className="text-[12px] font-bold text-cm-accent">Unlock R/hr →</Text>
+                </PremiumPressable>
+              )}
+            </View>
+          </View>
+        ) : null}
+
+        {/* ── Smart pick alert ── */}
+        {drivingRank.ranked.length >= 1 &&
+        drivingRank.current &&
+        drivingRank.ranked[0] &&
+        drivingRank.ranked[0].key !== drivingRank.current.key &&
+        drivingRank.ranked[0].estMidRph >= drivingRank.current.estMidRph * 1.08 ? (
+          isPro ? (
+            <View className="mb-6 rounded-3xl border border-amber-500/30 bg-amber-950/30 p-5">
+              <Text className="text-[11px] font-bold uppercase tracking-wider text-amber-200/95">{t("smartPickTitle", languageCode)}</Text>
+              <Text className="mt-2 text-[14px] leading-6 text-amber-50/95">
+                {t("smartPickBody", languageCode, {
+                  winner: formatDrivingOptionLabel(drivingRank.ranked[0]),
+                  current: formatDrivingOptionLabel(drivingRank.current),
+                })}
+              </Text>
+              <PremiumPressable
+                variant="none"
+                className="mt-4 self-start min-h-12 justify-center rounded-full bg-amber-400 px-8 py-3.5 shadow-cm-glow-sm"
+                onPress={() => {
+                  const w = drivingRank.ranked[0];
+                  setSelectedPlatform(w.platform);
+                  if (w.tierId) setRideHailActiveTier(w.platform, w.tierId);
+                }}
+              >
+                <Text className="text-center text-[14px] font-bold text-cm-on-accent">{t("smartPickFocus", languageCode)}</Text>
+              </PremiumPressable>
             </View>
           ) : (
-            <View className="items-center py-1">
-              <Text
-                className={`text-center text-[20px] font-bold tracking-tight ${isWorking ? "text-cm-on-accent" : "text-cm-ink"}`}
-              >
-                {isWorking ? t("trackingToggleOn", languageCode) : t("trackingToggleOff", languageCode)}
-              </Text>
-              <Text
-                className={`mt-1 text-center text-[13px] leading-5 ${isWorking ? "text-cm-on-accent/80" : "text-cm-ink-secondary"}`}
-              >
-                {isWorking ? t("trackingToggleHintOn", languageCode) : t("trackingToggleHintOff", languageCode)}
+            <PremiumPressable
+              variant="none"
+              className="mb-6 min-h-14 w-full justify-center rounded-3xl border-[1.5px] border-amber-600/40 bg-amber-950/30 px-5 py-4"
+              onPress={() => openUpgradeModal()}
+            >
+              <Text className="text-[11px] font-bold uppercase tracking-wider text-amber-200">{t("smartPickTitle", languageCode)}</Text>
+              <Text className="mt-2 text-[13px] leading-5 text-amber-100/90">{t("homeEarningsLocked", languageCode)}</Text>
+            </PremiumPressable>
+          )
+        ) : null}
+
+        {/* ── Live heatmap ── */}
+        <View className="mb-2 flex-row items-center justify-between">
+          <Text className="text-[13px] font-semibold text-cm-ink">Live zone heatmap</Text>
+          <PremiumPressable
+            variant={refreshing ? "none" : "primary"}
+            className={refreshing ? "min-h-10 justify-center rounded-full bg-cm-muted px-5 py-2" : "px-5 py-2 min-h-10 justify-center rounded-full bg-cm-accent"}
+            disabled={refreshing}
+            onPress={() => void refreshAll()}
+          >
+            <Text className={`text-[12px] font-bold ${refreshing ? "text-cm-ink-tertiary" : "text-cm-on-accent"}`}>
+              {refreshing ? t("refreshing", languageCode) : t("refresh", languageCode)}
+            </Text>
+          </PremiumPressable>
+        </View>
+        <View className="mb-3 h-96 overflow-hidden rounded-3xl border border-white/10 bg-cm-raised shadow-cm-card">
+          <View className="absolute right-3 top-3 z-10 rounded-2xl border border-cm-accent/25 bg-cm-surface/90 px-3 py-1.5 shadow-cm-glow-sm" pointerEvents="none">
+            <Text className="text-[10px] font-bold uppercase tracking-wide text-cm-ink-tertiary">Today</Text>
+            <Text className="text-[16px] font-extrabold tabular-nums text-cm-accent">{todayKm.toFixed(1)} km</Text>
+          </View>
+          {hasGoogleMapsKey ? (
+            <MapView
+              provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+              style={{ flex: 1, backgroundColor: CM.raised }}
+              region={mapRegion ?? getDefaultRegion(market.defaultCenter)}
+              customMapStyle={GOOGLE_MAP_DARK_STYLE}
+              scrollEnabled={false}
+              pitchEnabled={false}
+              rotateEnabled={false}
+              zoomEnabled
+              loadingEnabled
+              loadingIndicatorColor={CM.accent}
+            >
+              {realtimeZones.map((zone) => {
+                const heat = zoneHeatRgba(zone.score);
+                return (
+                  <Circle
+                    key={zone.id}
+                    center={{ latitude: zone.centerLat, longitude: zone.centerLng }}
+                    radius={900}
+                    fillColor={heat.fill}
+                    strokeColor={heat.stroke}
+                    strokeWidth={2}
+                  />
+                );
+              })}
+              {realtimeZones.map((zone) => (
+                <Marker
+                  key={`m-${zone.id}`}
+                  coordinate={{ latitude: zone.centerLat, longitude: zone.centerLng }}
+                  title={
+                    isPro
+                      ? `${formatMoney(zone.estimatedMinRph, marketCode)}-${formatMoney(zone.estimatedMaxRph, marketCode)}/hr - ${zone.competitionLabel}`
+                      : t("mapMarkerTitleLocked", languageCode)
+                  }
+                  description={
+                    isPro
+                      ? `${formatPingSegmentLabel(zone.platform)} · ${zone.suburb} · ~${zone.driverCount} drivers`
+                      : `${formatPingSegmentLabel(zone.platform)} · ${zone.suburb} · ${t("mapMarkerDriversLocked", languageCode)}`
+                  }
+                />
+              ))}
+              {/* Show more prediction rings when no live data — map never looks empty */}
+              {(isPro
+                ? predictedZones.slice(0, 5)
+                : realtimeZones.length === 0
+                  ? predictedZones.slice(0, 3)
+                  : predictedZones.slice(0, 1)
+              ).map((zone) => (
+                <Circle
+                  key={`pred-${zone.id}`}
+                  center={{ latitude: zone.centerLat, longitude: zone.centerLng }}
+                  radius={700}
+                  fillColor={
+                    isPro
+                      ? "rgba(0, 229, 255, 0.18)"
+                      : realtimeZones.length === 0
+                        ? "rgba(0, 229, 255, 0.12)"
+                        : "rgba(0, 229, 255, 0.05)"
+                  }
+                  strokeColor={
+                    isPro
+                      ? "rgba(0, 229, 255, 0.85)"
+                      : realtimeZones.length === 0
+                        ? "rgba(0, 229, 255, 0.55)"
+                        : "rgba(0, 229, 255, 0.32)"
+                  }
+                  strokeWidth={isPro ? 1.5 : 1}
+                />
+              ))}
+            </MapView>
+          ) : (
+            <View className="flex-1 items-center justify-center bg-cm-raised px-5">
+              <Text className="text-[32px]">🗺️</Text>
+              <Text className="mt-3 text-center text-[15px] font-bold text-cm-ink">Map not available</Text>
+              <Text className="mt-2 text-center text-[13px] leading-5 text-cm-ink-secondary">
+                A Google Maps API key is required to show the live map.
               </Text>
             </View>
           )}
-        </PremiumPressable>
-        <Text className="mt-3 text-center text-[11px] leading-4 text-cm-ink-tertiary">{t("workingHint", languageCode)}</Text>
-      </View>
-      {/* Quick zone summary — most valuable info above the fold */}
-      {bestNow && isWorking ? (
-        <View className="mb-4 rounded-2xl border border-cm-accent/25 bg-cm-accent-soft p-4">
-          <Text className="text-[11px] font-bold uppercase tracking-widest text-cm-accent">Best zone right now</Text>
-          <View className="mt-2 flex-row items-center justify-between">
-            <View className="flex-1">
-              <Text className="text-[17px] font-bold text-cm-ink">{bestNow.suburb}</Text>
-              <Text className="mt-0.5 text-[13px] text-cm-ink-secondary">{bestNow.displayName}</Text>
+          {hasGoogleMapsKey && realtimeZones.length === 0 ? (
+            <View className="absolute bottom-3 left-3 right-3 rounded-2xl border border-white/10 bg-cm-surface/90 px-4 py-3" pointerEvents="none">
+              <Text className="text-center text-[12px] leading-5 text-cm-ink-secondary">
+                Showing predicted zones — live data builds as more drivers use CashMap nearby.
+              </Text>
             </View>
-            {isPro ? (
-              <Text className="text-[20px] font-bold text-cm-accent">~{formatMoney(bestNow.est, marketCode)}/hr</Text>
-            ) : (
-              <PremiumPressable variant="none" className="rounded-full border border-cm-accent/40 bg-cm-canvas px-4 py-2" onPress={() => openUpgradeModal()}>
-                <Text className="text-[12px] font-bold text-cm-accent">Unlock R/hr →</Text>
-              </PremiumPressable>
-            )}
-          </View>
+          ) : null}
         </View>
-      ) : null}
 
-      {!isPro ? (
-        <PremiumPressable
-          variant="none"
-          className="mb-4 min-h-14 w-full justify-center rounded-full border-[1.5px] border-cm-cyan/35 bg-cm-cyan-dim px-6 py-5 shadow-cm-inner"
-          onPress={() => openUpgradeModal()}
-        >
-          <View>
+        {/* ── Legend ── */}
+        <View className="mb-5 flex-row items-center gap-4 px-1">
+          <View className="flex-row items-center gap-1.5"><View className="h-2.5 w-2.5 rounded-full bg-cm-accent" /><Text className="text-[11px] text-cm-ink-tertiary">High demand</Text></View>
+          <View className="flex-row items-center gap-1.5"><View className="h-2.5 w-2.5 rounded-full bg-[#FBBF24]" /><Text className="text-[11px] text-cm-ink-tertiary">Moderate</Text></View>
+          <View className="flex-row items-center gap-1.5"><View className="h-2.5 w-2.5 rounded-full bg-[#EF4444]" /><Text className="text-[11px] text-cm-ink-tertiary">Busy</Text></View>
+          <View className="flex-row items-center gap-1.5"><View className="h-2.5 w-2.5 rounded-full bg-cm-cyan" /><Text className="text-[11px] text-cm-ink-tertiary">Predicted</Text></View>
+        </View>
+
+        {/* ── Best platforms panel ── */}
+        {drivingRank.ranked.length > 0 ? (
+          <View className="mb-6 rounded-3xl border border-white/10 bg-cm-surface p-5 shadow-cm-card">
+            <Text className="mb-4 text-[11px] font-bold uppercase tracking-widest text-cm-accent">Best platforms right now</Text>
+            {drivingRank.ranked.slice(0, 3).map((row, idx) => (
+              <View key={row.key} className={`flex-row items-center gap-3 ${idx > 0 ? "mt-4 border-t border-white/[0.06] pt-4" : ""}`}>
+                <Text className="w-5 text-center text-[12px] font-bold text-cm-ink-tertiary">{idx + 1}</Text>
+                <PlatformGlyph name={row.platform} size="sm" />
+                <Text className="min-w-0 flex-1 text-[14px] font-semibold text-cm-ink" numberOfLines={1}>
+                  {formatDrivingOptionLabel(row)}
+                </Text>
+                {isPro ? (
+                  <Text className="text-[13px] font-bold text-cm-accent">
+                    ~{formatMoney(row.estMidRph, marketCode)}/hr
+                  </Text>
+                ) : (
+                  <PremiumPressable
+                    variant="none"
+                    className="min-h-9 min-w-[44px] items-center justify-center rounded-full border-[1.5px] border-cm-warn/40 bg-cm-warn-dim px-3"
+                    onPress={() => openUpgradeModal()}
+                  >
+                    <Text className="text-[10px] font-extrabold uppercase tracking-wide text-cm-warn">Pro</Text>
+                  </PremiumPressable>
+                )}
+              </View>
+            ))}
+          </View>
+        ) : null}
+
+        {/* ── Best now card ── */}
+        <View className="mb-6 rounded-3xl border border-cm-accent/20 bg-cm-raised/90 p-6 shadow-cm-card">
+          <Text className="text-[11px] font-bold uppercase tracking-[0.2em] text-cm-accent">
+            {drivingRank.ranked[0] ? t("bestNowRanked", languageCode) : t("homeBestNow", languageCode)}
+          </Text>
+          {isPro ? (
+            <Text className="mt-3 text-[20px] font-bold leading-7 text-cm-ink">
+              {bestNow.displayName} — {formatMoney(bestNow.est, marketCode)}/hr est
+            </Text>
+          ) : (
+            <PremiumPressable
+              variant="none"
+              className="mt-3 w-full min-h-16 justify-center rounded-2xl border-[1.5px] border-white/10 bg-cm-raised/60 px-5 py-4"
+              onPress={() => openUpgradeModal()}
+            >
+              <Text className="text-center text-[18px] font-bold leading-6 text-cm-ink">
+                {bestNow.displayName} — —
+              </Text>
+              <Text className="mt-2 text-center text-[12px] font-semibold text-cm-warn">{t("homeEarningsLocked", languageCode)}</Text>
+            </PremiumPressable>
+          )}
+          <Text className="mt-2 text-[13px] leading-5 text-cm-ink-secondary">
+            {bestNow.suburb ? `${bestNow.displayName} · ${bestNow.suburb}` : bestNow.displayName}
+          </Text>
+          {recommendedPlatforms.length >= 2 ? (
+            <Text className="mt-2 text-[12px] leading-5 text-cm-ink-secondary">
+              {t("strongestPlatformsNow", languageCode, { platforms: `${recommendedPlatforms[0]} and ${recommendedPlatforms[1]}` })}
+            </Text>
+          ) : null}
+          <View className="mt-5">
+            <CommunityToolNotice />
+          </View>
+          <PremiumPressable
+            variant="primary"
+            className="mt-4 w-full"
+            onPress={() => void Linking.openURL(getPlatformLink(bestNow.platform, marketCode))}
+          >
+            <Text className={BTN_PRIMARY_TEXT}>
+              {t("open", languageCode)} {bestNow.displayName}
+            </Text>
+          </PremiumPressable>
+          <PremiumPressable
+            variant="none"
+            className="mt-2 min-h-10 w-full justify-center"
+            onPress={() => setMapLegalOpen(true)}
+          >
+            <Text className="text-center text-[11px] text-cm-ink-tertiary">Community estimates · tap for legal info</Text>
+          </PremiumPressable>
+        </View>
+
+        {/* ── Pro upsell (free only) ── */}
+        {!isPro ? (
+          <PremiumPressable
+            variant="none"
+            className="mb-6 w-full justify-center rounded-3xl border-[1.5px] border-cm-cyan/35 bg-cm-cyan-dim px-6 py-5"
+            onPress={() => openUpgradeModal()}
+          >
             <Text className="text-[16px] font-bold leading-6 text-cm-ink">
               {t("launchGiveawayBannerHeadline", languageCode)}
             </Text>
             <Text className="mt-2 text-[14px] leading-5 text-cm-cyan">{t("launchGiveawayBannerSub", languageCode)}</Text>
-            <Text className="mt-3 text-[13px] font-bold uppercase tracking-wide text-cm-cyan">{t("launchGiveawayBannerTap", languageCode)}</Text>
-          </View>
-        </PremiumPressable>
-      ) : null}
-      {drivingRank.ranked.length >= 1 &&
-      drivingRank.current &&
-      drivingRank.ranked[0] &&
-      drivingRank.ranked[0].key !== drivingRank.current.key &&
-      drivingRank.ranked[0].estMidRph >= drivingRank.current.estMidRph * 1.08 ? (
-        isPro ? (
-          <View className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-950/30 px-4 py-4">
-            <Text className="text-[11px] font-bold uppercase tracking-wider text-amber-200/95">{t("smartPickTitle", languageCode)}</Text>
-            <Text className="mt-2 text-[13px] leading-5 text-amber-50/95">
-              {t("smartPickBody", languageCode, {
-                winner: formatDrivingOptionLabel(drivingRank.ranked[0]),
-                current: formatDrivingOptionLabel(drivingRank.current),
-              })}
-            </Text>
-            <PremiumPressable
-              variant="none"
-              className="mt-3 self-start min-h-12 justify-center rounded-full bg-amber-400 px-8 py-3.5 shadow-cm-glow-sm"
-              onPress={() => {
-                const w = drivingRank.ranked[0];
-                setSelectedPlatform(w.platform);
-                if (w.tierId) setRideHailActiveTier(w.platform, w.tierId);
-              }}
-            >
-              <Text className="text-center text-[14px] font-bold text-cm-on-accent">{t("smartPickFocus", languageCode)}</Text>
-            </PremiumPressable>
-          </View>
-        ) : (
-          <PremiumPressable
-            variant="none"
-            className="mb-4 min-h-14 w-full justify-center rounded-[28px] border-[1.5px] border-amber-600/40 bg-amber-950/30 px-5 py-4 shadow-cm-inner"
-            onPress={() => openUpgradeModal()}
-          >
-            <Text className="text-[11px] font-bold uppercase tracking-wider text-amber-200">{t("smartPickTitle", languageCode)}</Text>
-            <Text className="mt-2 text-[13px] leading-5 text-amber-100/90">{t("homeEarningsLocked", languageCode)}</Text>
+            <Text className="mt-3 text-[12px] font-bold uppercase tracking-wide text-cm-cyan">{t("launchGiveawayBannerTap", languageCode)}</Text>
           </PremiumPressable>
-        )
-      ) : null}
-      <View className="mb-3 flex-row items-center gap-3 rounded-xl border border-cm-accent/20 bg-cm-accent-soft px-4 py-3">
-        <Text className="min-w-0 flex-1 text-[12px] leading-5 text-cm-cyan/90">
-          {t("privacyBanner", languageCode)}
-        </Text>
-        <PremiumPressable
-          variant={refreshing ? "none" : "primary"}
-          className={
-            refreshing
-              ? "min-h-14 shrink-0 justify-center rounded-full bg-cm-muted px-7 py-4 shadow-cm-inner"
-              : "shrink-0 px-7"
-          }
-          disabled={refreshing}
-          onPress={() => void refreshAll()}
-        >
-          <Text className={`text-center text-[13px] font-bold uppercase tracking-wide ${refreshing ? "text-cm-ink-tertiary" : "text-cm-on-accent"}`}>
-            {refreshing ? t("refreshing", languageCode) : t("refresh", languageCode)}
-          </Text>
-        </PremiumPressable>
-      </View>
-      <Text className="mb-2 text-[12px] leading-4 text-cm-ink-tertiary">Live heatmap — green zones have high demand, red zones are busy with drivers</Text>
-      <View className="relative mb-3 h-72 overflow-hidden rounded-2xl border border-white/10 bg-cm-raised shadow-cm-card">
-        <View className="absolute right-2 top-2 z-10 rounded-2xl border border-cm-accent/25 bg-cm-surface/90 px-3 py-1.5 shadow-cm-glow-sm" pointerEvents="none">
-          <Text className="text-[10px] font-bold uppercase tracking-wide text-cm-ink-tertiary">Today</Text>
-          <Text className="text-[16px] font-extrabold tabular-nums text-cm-accent">{todayKm.toFixed(1)} km</Text>
-        </View>
-        {hasGoogleMapsKey ? (
-          <MapView
-            provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-            style={{ flex: 1, backgroundColor: CM.raised }}
-            initialRegion={JOHANNESBURG_REGION}
-            customMapStyle={GOOGLE_MAP_DARK_STYLE}
-            scrollEnabled={false}
-            pitchEnabled={false}
-            rotateEnabled={false}
-            zoomEnabled
-            loadingEnabled
-            loadingIndicatorColor={CM.accent}
-          >
-            {realtimeZones.map((zone) => {
-              const heat = zoneHeatRgba(zone.score);
-              return (
-                <Circle
-                  key={zone.id}
-                  center={{ latitude: zone.centerLat, longitude: zone.centerLng }}
-                  radius={900}
-                  fillColor={heat.fill}
-                  strokeColor={heat.stroke}
-                  strokeWidth={2}
-                />
-              );
-            })}
-            {realtimeZones.map((zone) => (
-              <Marker
-                key={`m-${zone.id}`}
-                coordinate={{ latitude: zone.centerLat, longitude: zone.centerLng }}
-                title={
-                  isPro
-                    ? `${formatMoney(zone.estimatedMinRph, marketCode)}-${formatMoney(zone.estimatedMaxRph, marketCode)}/hr - ${zone.competitionLabel}`
-                    : t("mapMarkerTitleLocked", languageCode)
-                }
-                description={
-                  isPro
-                    ? `${formatPingSegmentLabel(zone.platform)} · ${zone.suburb} · ~${zone.driverCount} drivers`
-                    : `${formatPingSegmentLabel(zone.platform)} · ${zone.suburb} · ${t("mapMarkerDriversLocked", languageCode)}`
-                }
-              />
-            ))}
-            {/* Pro: two prediction rings; Free: one faint teaser ring */}
-            {(isPro ? predictedZones.slice(0, 2) : predictedZones.slice(0, 1)).map((zone) => (
-              <Circle
-                key={`pred-${zone.id}`}
-                center={{ latitude: zone.centerLat, longitude: zone.centerLng }}
-                radius={650}
-                fillColor={isPro ? "rgba(0, 229, 255, 0.16)" : "rgba(0, 229, 255, 0.05)"}
-                strokeColor={isPro ? "rgba(0, 229, 255, 0.82)" : "rgba(0, 229, 255, 0.32)"}
-                strokeWidth={isPro ? 1 : 1}
-              />
-            ))}
-          </MapView>
-        ) : (
-          <View className="flex-1 items-center justify-center bg-cm-raised px-5">
-            <Text className="text-[32px]">🗺️</Text>
-            <Text className="mt-3 text-center text-[15px] font-bold text-cm-ink">Map not available</Text>
-            <Text className="mt-2 text-center text-[13px] leading-5 text-cm-ink-secondary">
-              A Google Maps API key is required to show the live map. Add GOOGLE_MAPS_API_KEY to your .env file and rebuild.
-            </Text>
-          </View>
-        )}
-        {hasGoogleMapsKey && realtimeZones.length === 0 ? (
-          <View className="absolute bottom-3 left-3 right-3 rounded-xl border border-white/10 bg-cm-surface/90 px-4 py-3" pointerEvents="none">
-            <Text className="text-center text-[12px] leading-5 text-cm-ink-secondary">
-              No zone data yet — data builds up as more drivers use CashMap in your area. Start a shift to contribute!
-            </Text>
-          </View>
         ) : null}
 
-        {/* Floating “best platforms” snapshot — quick read while map is visible */}
-        {drivingRank.ranked.length > 0 ? (
-          <View className="absolute bottom-2 left-2 right-2" pointerEvents="box-none" style={{ elevation: 6 }}>
-            <View className="rounded-2xl border border-white/15 bg-cm-surface/95 px-3 py-3 shadow-cm-card" pointerEvents="auto">
-              <Text className="text-[10px] font-bold uppercase tracking-wider text-cm-accent">Best platforms right now</Text>
-              {drivingRank.ranked.slice(0, 3).map((row, idx) => (
-                <View key={row.key} className={`mt-1.5 flex-row items-center gap-2 ${idx > 0 ? "opacity-95" : ""}`}>
-                  <Text className="w-4 text-center text-[11px] font-bold text-cm-ink-tertiary">{idx + 1}</Text>
-                  <PlatformGlyph name={row.platform} size="sm" />
-                  <Text className="min-w-0 flex-1 text-[12px] font-semibold text-cm-ink" numberOfLines={1}>
-                    {formatDrivingOptionLabel(row)}
-                  </Text>
-                  {isPro ? (
-                    <Text className="text-[11px] font-bold text-cm-accent">
-                      ~{formatMoney(row.estMidRph, marketCode)}/hr
-                    </Text>
-                  ) : (
-                    <PremiumPressable
-                      variant="none"
-                      className="min-h-10 min-w-[40px] items-center justify-center rounded-full border-[1.5px] border-cm-warn/40 bg-cm-warn-dim px-2"
-                      onPress={() => openUpgradeModal()}
-                    >
-                      <Text className="text-[10px] font-extrabold uppercase tracking-wide text-cm-warn">Pro</Text>
-                    </PremiumPressable>
-                  )}
-                </View>
-              ))}
+        {/* ── Mileage summary ── */}
+        <View className="mb-6 rounded-3xl border border-white/10 bg-cm-surface/80 px-5 py-5">
+          <Text className="text-[11px] font-bold uppercase tracking-widest text-cm-ink-tertiary mb-3">Mileage tracked</Text>
+          <View className="flex-row justify-between">
+            <View className="items-center flex-1">
+              <Text className="text-[22px] font-bold text-cm-accent">{todayKm.toFixed(1)}</Text>
+              <Text className="mt-1 text-[11px] text-cm-ink-tertiary">km today</Text>
+            </View>
+            <View className="w-px bg-white/10" />
+            <View className="items-center flex-1">
+              <Text className="text-[22px] font-bold text-cm-ink">{weeklyKm.toFixed(1)}</Text>
+              <Text className="mt-1 text-[11px] text-cm-ink-tertiary">km this week</Text>
             </View>
           </View>
-        ) : null}
-      </View>
-
-      {/* Heatmap legend — green → red demand gradient + cyan prediction */}
-      <View className="mb-3 flex-row items-center gap-4 px-1">
-        <View className="flex-row items-center gap-1.5"><View className="h-2.5 w-2.5 rounded-full bg-cm-accent" /><Text className="text-[11px] text-cm-ink-tertiary">High demand</Text></View>
-        <View className="flex-row items-center gap-1.5"><View className="h-2.5 w-2.5 rounded-full bg-[#FBBF24]" /><Text className="text-[11px] text-cm-ink-tertiary">Moderate</Text></View>
-        <View className="flex-row items-center gap-1.5"><View className="h-2.5 w-2.5 rounded-full bg-[#EF4444]" /><Text className="text-[11px] text-cm-ink-tertiary">High competition</Text></View>
-        <View className="flex-row items-center gap-1.5"><View className="h-2.5 w-2.5 rounded-full bg-cm-cyan" /><Text className="text-[11px] text-cm-ink-tertiary">Predicted</Text></View>
-      </View>
-      <View className="mb-3 flex-row items-start justify-between gap-3">
-        <Text className="min-w-0 flex-1 text-[12px] leading-5 text-cm-ink-secondary">
-          Estimates from anonymous community data — not financial advice.
-        </Text>
-        <PremiumPressable
-          variant="secondary"
-          className="min-h-12 shrink-0 px-5 py-3"
-          onPress={() => setMapLegalOpen(true)}
-        >
-          <Text className="text-center text-[13px] font-bold text-cm-accent">Legal</Text>
-        </PremiumPressable>
-      </View>
-      <View className="rounded-3xl border border-cm-accent/20 bg-cm-raised/90 p-5 shadow-cm-card">
-        <Text className="text-[11px] font-bold uppercase tracking-[0.2em] text-cm-accent">
-          {drivingRank.ranked[0] ? t("bestNowRanked", languageCode) : t("homeBestNow", languageCode)}
-        </Text>
-        {isPro ? (
-          <Text className="mt-3 text-[18px] font-bold leading-6 text-cm-ink">
-            {bestNow.displayName} — {formatMoney(bestNow.est, marketCode)}/hr est
-          </Text>
-        ) : (
-          <PremiumPressable
-            variant="none"
-            className="mt-2 w-full min-h-16 justify-center rounded-[28px] border-[1.5px] border-white/10 bg-cm-raised/60 px-5 py-4"
-            onPress={() => openUpgradeModal()}
-          >
-            <Text className="text-center text-[18px] font-bold leading-6 text-cm-ink">
-              {bestNow.displayName} — —
-            </Text>
-            <Text className="mt-2 text-center text-[12px] font-semibold text-cm-warn">{t("homeEarningsLocked", languageCode)}</Text>
-          </PremiumPressable>
-        )}
-        <Text className="mt-2 text-[13px] leading-5 text-cm-ink-secondary">
-          {bestNow.suburb ? `${bestNow.displayName} · ${bestNow.suburb}` : bestNow.displayName}
-        </Text>
-        {isPro && drivingRank.current && drivingRank.ranked[0]?.key !== drivingRank.current.key ? (
-          <Text className="mt-2 text-[12px] leading-5 text-cm-cyan/90">
-            {t("youreViewing", languageCode, { option: formatDrivingOptionLabel(drivingRank.current) })}
-          </Text>
-        ) : null}
-        {recommendedPlatforms.length >= 2 ? (
-          <Text className="mt-2 text-[12px] leading-5 text-cm-ink-secondary">
-            {t("strongestPlatformsNow", languageCode, { platforms: `${recommendedPlatforms[0]} and ${recommendedPlatforms[1]}` })}
-          </Text>
-        ) : null}
-        <View className="mt-4">
-          <CommunityToolNotice />
-        </View>
-        <PremiumPressable
-          variant="primary"
-          className="mt-4 w-full"
-          onPress={() => void Linking.openURL(getPlatformLink(bestNow.platform, marketCode))}
-        >
-          <Text className={BTN_PRIMARY_TEXT}>
-            {t("open", languageCode)} {bestNow.displayName}
-          </Text>
-        </PremiumPressable>
-      </View>
-
-      {!isPro ? (
-        <PremiumPressable variant="tertiary" className="mt-4 w-full" onPress={() => openUpgradeModal()}>
-          <Text className="text-center text-[13px] font-bold leading-5 text-cm-ink-secondary">
-            {t("proLockAdTeaser", languageCode)}
-          </Text>
-        </PremiumPressable>
-      ) : null}
-
-      <View className="mt-5 flex-1 justify-end">
-        <View className="mt-4 rounded-2xl border border-white/10 bg-cm-surface/80 px-4 py-4">
-          <Text className="text-center text-[15px] font-semibold text-cm-ink">
-            {t("mileageTodayTracked", languageCode, { km: todayKm.toFixed(1) })}
-          </Text>
-          <Text className="mt-1.5 text-center text-[15px] font-semibold text-cm-ink-secondary">
-            {t("mileageThisWeekTracked", languageCode, { km: weeklyKm.toFixed(1) })}
-          </Text>
-          <Text className="mt-3 text-center text-[12px] leading-5 text-amber-200/85">
-            {t("mileageExportLater", languageCode)}
-          </Text>
-          <Text className="mt-2 text-center text-[12px] leading-5 text-cm-ink-tertiary">
+          <Text className="mt-4 text-center text-[11px] leading-4 text-cm-ink-tertiary">
             {t("mileageAnonymousTrackedDisclaimer", languageCode)}
           </Text>
         </View>
+
         {recommendedPlatforms.length > 0 ? (
-          <Text className="mt-3 text-center text-[12px] font-semibold text-cm-accent">
+          <Text className="mb-4 text-center text-[12px] font-semibold text-cm-accent">
             {t("cashMapRecommends", languageCode, { platforms: recommendedPlatforms.join(" • ") })}
           </Text>
         ) : null}
-        <DisclaimerFooter className="mt-6 pb-2" />
-      </View>
+
+        <DisclaimerFooter className="pb-2" />
       </GHScrollView>
 
       <Modal visible={Boolean(pendingPrompt)} transparent animationType="slide">

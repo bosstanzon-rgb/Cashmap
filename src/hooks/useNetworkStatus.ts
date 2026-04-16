@@ -1,32 +1,53 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 
 /**
- * Simple network status hook using fetch-based connectivity check.
- * Returns isOnline boolean. Rechecks on app foreground.
+ * Network status hook. Defaults to online and only shows offline
+ * when a check definitively fails. Uses your own Supabase URL as the
+ * probe — avoids false positives from blocked Google URLs.
+ * Shows offline banner only after 2 consecutive failures.
  */
 export const useNetworkStatus = () => {
   const [isOnline, setIsOnline] = useState(true);
+  const failCount = useRef(0);
 
   const check = async () => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
     try {
-      const res = await fetch("https://www.google.com/generate_204", {
+      // Probe our own Supabase — if this works, we have internet
+      await fetch("https://xclsnfqjwjaatmvvxpea.supabase.co/health", {
         method: "HEAD",
         cache: "no-cache",
-        signal: AbortSignal.timeout(3000),
+        signal: controller.signal,
       });
-      setIsOnline(res.status === 204 || res.ok);
+      clearTimeout(timer);
+      failCount.current = 0;
+      setIsOnline(true);
     } catch {
-      setIsOnline(false);
+      clearTimeout(timer);
+      failCount.current += 1;
+      // Only show offline after 2 consecutive failures to avoid false positives
+      if (failCount.current >= 2) {
+        setIsOnline(false);
+      }
     }
   };
 
   useEffect(() => {
-    void check();
+    // Delay initial check by 2s so app finishes loading first
+    const initialDelay = setTimeout(() => void check(), 2000);
     const sub = AppState.addEventListener("change", (state) => {
-      if (state === "active") void check();
+      if (state === "active") {
+        failCount.current = 0;
+        setIsOnline(true); // Optimistically online when app comes to foreground
+        setTimeout(() => void check(), 1000);
+      }
     });
-    return () => sub.remove();
+    return () => {
+      clearTimeout(initialDelay);
+      sub.remove();
+    };
   }, []);
 
   return { isOnline };
