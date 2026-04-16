@@ -119,8 +119,9 @@ export const useZoneAdvice = (payload: {
     const interval = setInterval(() => {
       void refresh();
     }, 5 * 60 * 1000);
+    const channelName = `zone-advice-${payload.selectedPlatform}-${payload.marketCode ?? "ZA"}`;
     const channel = supabase
-      .channel("zone-advice-live")
+      .channel(channelName)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "location_pings" },
