@@ -59,7 +59,6 @@ import {
 import { insertShiftLog } from "@/services/supabase";
 import { scheduleAppAlert } from "@/services/alerts";
 import { LegalDisclaimer } from "@/components/LegalDisclaimer";
-import { CommunityToolNotice } from "@/components/CommunityToolNotice";
 import { MvpDisclaimerBanner } from "@/components/MvpDisclaimerBanner";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { PlatformGlyph } from "@/lib/platformVisuals";

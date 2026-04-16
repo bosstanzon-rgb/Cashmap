@@ -14,7 +14,6 @@ import { formatPingSegmentLabel } from "@/lib/locationPingSegments";
 import { useOpenPaywall } from "@/navigation/useOpenPaywall";
 import { DisclaimerFooter } from "@/components/DisclaimerFooter";
 import { MvpDisclaimerBanner } from "@/components/MvpDisclaimerBanner";
-import { OfflineBanner } from "@/components/OfflineBanner";
 import { PremiumPressable } from "@/components/PremiumPressable";
 import { BTN_PRIMARY_TEXT } from "@/constants/buttonStyles";
 

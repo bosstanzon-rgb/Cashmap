@@ -6,7 +6,6 @@ import {
   purchaseLifetime,
   purchaseMonthly,
   purchaseYearly,
-  REVENUECAT_NOT_CONFIGURED_MESSAGE,
 } from "@/services/revenuecat";
 import { useProStore } from "@/store/proStore";
 import { useAppStore } from "@/store/useAppStore";

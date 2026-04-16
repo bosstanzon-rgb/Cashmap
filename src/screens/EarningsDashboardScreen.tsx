@@ -13,7 +13,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { selectEntitledToPro, useProStore } from "@/store/proStore";
 import { getMarketConfig, formatMoney } from "@/constants/markets";
 import { t } from "@/constants/i18n";
-import { WeeklyEarningsVictoryChart, type WeeklyChartDatum } from "@/components/WeeklyEarningsChart";
+import { WeeklyEarningsVictoryChart } from "@/components/WeeklyEarningsChart";
 import { DisclaimerFooter } from "@/components/DisclaimerFooter";
 import { MvpDisclaimerBanner } from "@/components/MvpDisclaimerBanner";
 import { OfflineBanner } from "@/components/OfflineBanner";
