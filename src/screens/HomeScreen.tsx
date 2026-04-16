@@ -160,7 +160,7 @@ export const HomeScreen = () => {
       Constants.expoConfig?.android?.config?.googleMaps?.apiKey ||
       process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
   );
-  const defaultPrimary = (selectedPlatforms.length > 0 ? selectedPlatforms : market.primaryPlatforms).slice(0, 3);
+  const defaultPrimary = selectedPlatforms.length > 0 ? selectedPlatforms : market.primaryPlatforms;
   const fakePlatformScores = [
     { platform: defaultPrimary[0] ?? "Platform A", suburb: market.defaultSuburbs[0] ?? market.city, score: 9.2, est: 320 },
     { platform: defaultPrimary[1] ?? "Platform B", suburb: market.defaultSuburbs[1] ?? market.city, score: 8.1, est: 280 },
@@ -603,22 +603,31 @@ export const HomeScreen = () => {
           >
             <OfflineBanner />
 
-            {/* ── Platform tabs ── */}
-            <View style={{ flexDirection: "row", gap: 8, marginBottom: 16, backgroundColor: "rgba(255,255,255,0.05)", borderRadius: 14, padding: 4 }}>
+            {/* ── Platform tabs — horizontally scrollable ── */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ marginBottom: 16 }}
+              contentContainerStyle={{ gap: 8, paddingVertical: 2 }}
+            >
               {defaultPrimary.map((platform) => (
                 <PremiumPressable
                   key={platform}
                   variant="chip"
-                  className={`flex-1 flex-row items-center justify-center gap-1 rounded-xl px-1 py-2 ${selectedPlatform === platform ? "bg-cm-accent" : "bg-transparent"}`}
+                  className={`flex-row items-center gap-1.5 rounded-xl px-4 py-2.5 ${
+                    selectedPlatform === platform
+                      ? "border-transparent bg-cm-accent shadow-cm-glow-sm"
+                      : "border border-white/20 bg-cm-raised"
+                  }`}
                   onPress={() => setSelectedPlatform(platform)}
                 >
                   <PlatformGlyph name={platform} size="sm" />
-                  <Text numberOfLines={1} className={`max-w-[80%] text-center text-[12px] font-bold ${selectedPlatform === platform ? "text-cm-on-accent" : "text-cm-ink-secondary"}`}>
+                  <Text numberOfLines={1} className={`text-[12px] font-bold ${selectedPlatform === platform ? "text-cm-on-accent" : "text-cm-ink"}`}>
                     {platform}
                   </Text>
                 </PremiumPressable>
               ))}
-            </View>
+            </ScrollView>
 
             {/* ── I'm Working button ── */}
             <PremiumPressable

@@ -115,23 +115,28 @@ export const PredictionsScreen = () => {
       <View className="mt-4">
         <CommunityToolNotice />
       </View>
-      <View className="mt-4 flex-row flex-wrap gap-2 rounded-3xl border border-white/10 bg-cm-raised/80 p-1.5 shadow-cm-inner">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="mt-4"
+        contentContainerStyle={{ gap: 8, paddingHorizontal: 2, paddingVertical: 2 }}
+      >
         {tabList.map((item) => (
           <PremiumPressable
             key={item}
             variant="chip"
-            className={`max-w-[48%] flex-1 px-3 ${platform === item ? "border-transparent bg-cm-accent shadow-cm-glow-sm" : "border-transparent bg-transparent"}`}
+            className={`px-4 py-2.5 rounded-xl ${platform === item ? "border-transparent bg-cm-accent shadow-cm-glow-sm" : "border border-white/20 bg-cm-raised"}`}
             onPress={() => setPlatform(item)}
           >
             <Text
               numberOfLines={1}
-              className={`max-w-[140px] text-center text-[13px] font-bold ${platform === item ? "text-cm-on-accent" : "text-cm-ink-secondary"}`}
+              className={`text-center text-[13px] font-bold ${platform === item ? "text-cm-on-accent" : "text-cm-ink"}`}
             >
               {item}
             </Text>
           </PremiumPressable>
         ))}
-      </View>
+      </ScrollView>
 
       {drivingRank.ranked.length > 0 ? (
         <View className="mt-5 rounded-2xl border border-white/10 bg-cm-surface p-5">

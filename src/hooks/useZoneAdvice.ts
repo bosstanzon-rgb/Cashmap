@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchRecentLocationPings, supabase } from "@/services/supabase";
+import { fetchRecentLocationPings } from "@/services/supabase";
 import { distanceKm, getSuburbName } from "@/lib/geo";
 import { getMarketConfig } from "@/constants/markets";
 import {
@@ -115,25 +115,9 @@ export const useZoneAdvice = (payload: {
 
   useEffect(() => {
     void refresh();
-    // Refresh every 5 minutes as a fallback (realtime subscription handles live updates)
-    const interval = setInterval(() => {
-      void refresh();
-    }, 5 * 60 * 1000);
-    const channelName = `zone-advice-${payload.selectedPlatform}-${payload.marketCode ?? "ZA"}`;
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "location_pings" },
-        () => {
-          void refresh();
-        }
-      )
-      .subscribe();
-    return () => {
-      clearInterval(interval);
-      void supabase.removeChannel(channel);
-    };
+    // Poll every 3 minutes — realtime removed to prevent channel conflicts
+    const interval = setInterval(() => void refresh(), 3 * 60 * 1000);
+    return () => clearInterval(interval);
   }, [refresh]);
 
   const getTopZoneForPlatform = useCallback(
