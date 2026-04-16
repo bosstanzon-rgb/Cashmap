@@ -28,4 +28,4 @@ Your personal earnings are private. An anonymised version (suburb + platform + e
 - Export your data via CSV export on the Earnings screen
 
 ## Contact
-support@cashmap.app
+bosstanzon@gmail.com
