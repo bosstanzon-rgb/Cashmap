@@ -58,13 +58,11 @@ export const EarningsDashboardScreen = () => {
 
   const isPro = useProStore(selectEntitledToPro);
   const openUpgradeModal = useProStore((s) => s.openUpgradeModal);
-  const { todayKm, weeklyKm, totalKm, lastLocation, refreshAll } = useMileageStore((s) => ({
-    todayKm: s.todayKm,
-    weeklyKm: s.weeklyKm,
-    totalKm: s.totalKm,
-    lastLocation: s.lastLocation,
-    refreshAll: s.refreshAll,
-  }));
+  const todayKm = useMileageStore((s) => s.todayKm);
+  const weeklyKm = useMileageStore((s) => s.weeklyKm);
+  const totalKm = useMileageStore((s) => s.totalKm);
+  const lastLocation = useMileageStore((s) => s.lastLocation);
+  const refreshAll = useMileageStore((s) => s.refreshAll);
 
   const [initialLoad, setInitialLoad] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

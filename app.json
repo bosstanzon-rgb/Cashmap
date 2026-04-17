@@ -11,7 +11,7 @@
       "backgroundColor": "#0A0A0A"
     },
     "android": {
-      "package": "com.cashmap.app",
+      "package": "com.cashmap.driverapp",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
@@ -32,7 +32,7 @@
       }
     },
     "ios": {
-      "bundleIdentifier": "com.cashmap.app",
+      "bundleIdentifier": "com.cashmap.driverapp",
       "buildNumber": "1.0.0"
     },
     "plugins": [

@@ -446,6 +446,8 @@ export const HomeScreen = () => {
             zoomEnabled
             loadingEnabled
             loadingIndicatorColor={CM.accent}
+            showsUserLocation
+            showsMyLocationButton={false}
           >
             {realtimeZones.map((zone) => {
               const heat = zoneHeatRgba(zone.score);
@@ -471,37 +473,29 @@ export const HomeScreen = () => {
                 strokeWidth={isPro ? 1.5 : 1}
               />
             ))}
-            {/* User location marker */}
+            {/* User location dot */}
             {currentLocation ? (
               <Marker
                 coordinate={{ latitude: currentLocation.lat, longitude: currentLocation.lng }}
                 anchor={{ x: 0.5, y: 0.5 }}
                 flat
+                tracksViewChanges={false}
               >
-                <View style={{ alignItems: "center", justifyContent: "center" }}>
-                  {/* Outer pulse ring */}
+                <View style={{ width: 22, height: 22, alignItems: "center", justifyContent: "center" }}>
                   <View style={{
                     position: "absolute",
-                    width: 36,
-                    height: 36,
-                    borderRadius: 18,
-                    backgroundColor: "rgba(0,229,255,0.15)",
-                    borderWidth: 1,
-                    borderColor: "rgba(0,229,255,0.4)",
+                    width: 22, height: 22, borderRadius: 11,
+                    backgroundColor: "rgba(0,122,255,0.2)",
                   }} />
-                  {/* Inner dot */}
                   <View style={{
-                    width: 14,
-                    height: 14,
-                    borderRadius: 7,
-                    backgroundColor: "#00E5FF",
-                    borderWidth: 2.5,
-                    borderColor: "#fff",
-                    shadowColor: "#00E5FF",
+                    width: 12, height: 12, borderRadius: 6,
+                    backgroundColor: "#007AFF",
+                    borderWidth: 2, borderColor: "#FFFFFF",
+                    shadowColor: "#007AFF",
                     shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.9,
-                    shadowRadius: 8,
-                    elevation: 8,
+                    shadowOpacity: 0.8,
+                    shadowRadius: 6,
+                    elevation: 6,
                   }} />
                 </View>
               </Marker>
@@ -509,7 +503,7 @@ export const HomeScreen = () => {
           </MapView>
         ) : (
           <View style={{ flex: 1, backgroundColor: CM.raised, alignItems: "center", justifyContent: "center", padding: 24 }}>
-            <Text style={{ fontSize: 32 }}>🗺️</Text>
+            <Text style={{ fontSize: 40, color: "#2C3136" }}>⬡</Text>
             <Text style={{ color: CM.inkSecondary, fontSize: 15, fontWeight: "700", marginTop: 12 }}>Map not available</Text>
             <Text style={{ color: "#AAAAAA", fontSize: 13, marginTop: 8, textAlign: "center" }}>Add a Google Maps API key to show the live heatmap.</Text>
           </View>
@@ -530,7 +524,7 @@ export const HomeScreen = () => {
             shadowOpacity: 0.4, shadowRadius: 8, elevation: 8,
           }}
         >
-          <Text style={{ fontSize: 18 }}>📍</Text>
+          <Text style={{ color: "#00E5FF", fontSize: 18 }}>◎</Text>
         </TouchableOpacity>
         {/* Go to busiest zone button */}
         <TouchableOpacity
@@ -544,7 +538,7 @@ export const HomeScreen = () => {
             shadowOpacity: 0.5, shadowRadius: 8, elevation: 8,
           }}
         >
-          <Text style={{ fontSize: 18 }}>🔥</Text>
+          <Text style={{ color: "#00FF9D", fontSize: 16 }}>◈</Text>
         </TouchableOpacity>
       </View>
 
@@ -559,7 +553,7 @@ export const HomeScreen = () => {
           {/* Working indicator */}
           {isWorking ? (
             <View style={{ backgroundColor: "rgba(0,255,157,0.15)", borderRadius: 20, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: "rgba(0,255,157,0.4)", flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: CM.accent }} />
+              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: CM.accent, shadowColor: CM.accent, shadowOffset: {width:0,height:0}, shadowOpacity: 1, shadowRadius: 4 }} />
               <Text style={{ color: CM.accent, fontSize: 11, fontWeight: "700" }}>LIVE</Text>
             </View>
           ) : null}
@@ -571,7 +565,7 @@ export const HomeScreen = () => {
           style={{ backgroundColor: "rgba(10,10,10,0.82)", borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: "rgba(255,255,255,0.12)" }}
         >
           <Text style={{ color: refreshing ? "#666" : "#fff", fontSize: 12, fontWeight: "700" }}>
-            {refreshing ? "..." : "↻ Refresh"}
+            {refreshing ? "···" : "Refresh"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -835,32 +829,29 @@ export const HomeScreen = () => {
                   gap: 7,
                 }}
               >
-                <Text style={{ fontSize: 14 }}>🔵</Text>
-                <Text style={{ color: "#00E5FF", fontSize: 13, fontWeight: "700" }}>Waze</Text>
+                <Text style={{ color: "#00E5FF", fontSize: 13, fontWeight: "700" }}>W · Waze</Text>
               </TouchableOpacity>
               {/* Google Maps */}
               <TouchableOpacity
                 onPress={() => { openGoogleMapsNav(); setShowNavOptions(false); }}
                 style={{
-                  backgroundColor: "#1B1F23",
-                  borderRadius: 12,
-                  borderLeftWidth: 3,
-                  borderLeftColor: "#00FF9D",
+                  backgroundColor: "#00FF9D",
+                  borderRadius: 999,
                   paddingVertical: 12,
-                  paddingHorizontal: 16,
+                  paddingHorizontal: 18,
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 8,
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.4,
-                  shadowRadius: 8,
-                  elevation: 8,
+                  shadowColor: "#00FF9D",
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.6,
+                  shadowRadius: 16,
+                  elevation: 10,
                 }}
               >
-                <Text style={{ fontSize: 16 }}>🗺️</Text>
-                <Text style={{ color: "#00FF9D", fontSize: 14, fontWeight: "800" }}>Go</Text>
-                <Text style={{ color: "#A0AEC0", fontSize: 11 }}>→ {bestZoneCoords.suburb}</Text>
+                <Text style={{ color: "#0A0A0A", fontSize: 13, fontWeight: "900" }}>▶</Text>
+                <Text style={{ color: "#0A0A0A", fontSize: 14, fontWeight: "900" }}>Go</Text>
+                <Text style={{ color: "rgba(0,0,0,0.55)", fontSize: 11 }}>→ {bestZoneCoords.suburb}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setShowNavOptions(false)} style={{ paddingVertical: 4, paddingHorizontal: 8 }}>
                 <Text style={{ color: "#666", fontSize: 11 }}>✕ Cancel</Text>
@@ -871,22 +862,22 @@ export const HomeScreen = () => {
               onPress={() => setShowNavOptions(true)}
               style={{
                 backgroundColor: "#00FF9D",
-                borderRadius: 999,
-                paddingVertical: 11,
-                paddingHorizontal: 18,
+                borderRadius: 14,
+                paddingVertical: 13,
+                paddingHorizontal: 20,
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 7,
+                gap: 8,
                 shadowColor: "#00FF9D",
                 shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.65,
-                shadowRadius: 14,
-                elevation: 10,
+                shadowOpacity: 0.8,
+                shadowRadius: 16,
+                elevation: 12,
               }}
             >
-              <Text style={{ fontSize: 16 }}>🔥</Text>
-              <Text style={{ color: "#00FF9D", fontSize: 14, fontWeight: "800" }}>Go</Text>
-              <Text style={{ color: "#A0AEC0", fontSize: 11 }}>→ {bestZoneCoords.suburb}</Text>
+              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#0A0A0A" }} />
+              <Text style={{ color: "#0A0A0A", fontSize: 15, fontWeight: "900", letterSpacing: 0.5 }}>GO</Text>
+              <Text style={{ color: "rgba(0,0,0,0.5)", fontSize: 11, fontWeight: "600" }}>→ {bestZoneCoords.suburb}</Text>
             </TouchableOpacity>
           )}
         </Animated.View>
@@ -926,7 +917,7 @@ export const HomeScreen = () => {
               <View className="mt-4 flex-row gap-2">
                 {(["Great day", "Average", "Slow day"] as const).map((item) => (
                   <PremiumPressable key={item} variant="chip" className={`flex-1 px-2 ${rating === item ? "border-transparent bg-cm-accent shadow-cm-glow-sm" : "border-white/10 bg-cm-muted/90"}`} onPress={() => setRating(item)}>
-                    <Text className={`text-center text-[12px] font-bold leading-4 ${rating === item ? "text-cm-on-accent" : "text-cm-ink-secondary"}`}>{item === "Great day" ? "😊" : item === "Average" ? "🙂" : "😕"} {item}</Text>
+                    <Text className={`text-center text-[12px] font-bold leading-4 ${rating === item ? "text-cm-on-accent" : "text-cm-ink-secondary"}`}>{item === "Great day" ? "▲" : item === "Average" ? "─" : "▼"} {item}</Text>
                   </PremiumPressable>
                 ))}
               </View>
