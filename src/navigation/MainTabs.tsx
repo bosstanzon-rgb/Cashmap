@@ -42,9 +42,8 @@ export const MainTabs = () => {
           marginTop: 3,
         },
         tabBarStyle: {
-          backgroundColor: CM.surface,
-          borderTopWidth: 1,
-          borderTopColor: "rgba(255,255,255,0.08)",
+          backgroundColor: "#1B1F23",
+          borderTopWidth: 0,
           elevation: 8,
           height: tabBarHeight,
           paddingBottom: bottomPad,
@@ -75,8 +74,8 @@ export const MainTabs = () => {
                   style={{
                     shadowColor: CM.accent,
                     shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.65,
-                    shadowRadius: 6,
+                    shadowOpacity: 0.9,
+                    shadowRadius: 10,
                   }}
                 />
               ) : null}

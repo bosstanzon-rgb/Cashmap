@@ -46,7 +46,7 @@ export const WelcomeScreen = ({ navigation }: Props) => {
             { icon: "🔥", title: "Find hot zones", body: "See live demand heatmaps across the city. Green = high orders, cyan = predicted surge zones." },
             { icon: "💰", title: "Log your earnings", body: "After each shift, log your earnings. CashMap builds your weekly income history automatically." },
           ].map((item) => (
-            <View key={item.title} className="flex-row items-start gap-3 rounded-xl border border-white/10 bg-cm-raised px-4 py-3">
+            <View key={item.title} className="flex-row items-start gap-3 rounded-xl bg-cm-raised px-4 py-3">
               <Text className="text-[22px]">{item.icon}</Text>
               <View className="flex-1">
                 <Text className="text-[14px] font-bold text-cm-ink">{item.title}</Text>
@@ -85,7 +85,7 @@ export const WelcomeScreen = ({ navigation }: Props) => {
           })}
         </View>
       </GlassCard>
-      <View className="mt-6 rounded-2xl border border-white/10 bg-cm-surface p-4">
+      <View className="mt-6 rounded-2xl bg-cm-surface p-5">
         <Text className="text-[14px] font-semibold text-cm-ink">Language</Text>
         <Text className="mt-1 text-[12px] text-cm-ink-tertiary">Choose your preferred language</Text>
         <View className="mt-3 flex-row flex-wrap gap-2">

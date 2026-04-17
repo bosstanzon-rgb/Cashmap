@@ -23,7 +23,7 @@ export const LegalDisclaimer = ({ compact, showPolicyLinks }: Props) => {
 
   return (
     <View
-      className={`rounded-3xl border border-white/10 bg-cm-surface/95 shadow-cm-inner ${compact ? "p-3" : "p-4"}`}
+      className={`rounded-3xl bg-cm-surface/95 shadow-cm-inner ${compact ? "p-3" : "p-4"}`}
     >
       <Text className={`leading-6 text-cm-ink-secondary ${compact ? "text-[11px]" : "text-[13px]"}`}>
         {CASHMAP_FULL_DISCLAIMER}

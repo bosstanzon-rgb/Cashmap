@@ -71,10 +71,10 @@ export const ProfileSetupScreen = () => {
         onChangeText={setNicknameInput}
         placeholder="Driver-1234"
         placeholderTextColor={INPUT_PLACEHOLDER}
-        className="mt-2 rounded-3xl border border-white/10 bg-cm-raised/90 px-4 py-3.5 text-[16px] text-cm-ink shadow-cm-inner"
+        className="mt-2 rounded-3xl bg-cm-raised/90 px-4 py-3.5 text-[16px] text-cm-ink shadow-cm-inner"
       />
 
-      <View className="mt-8 rounded-3xl border border-white/10 bg-cm-surface/90 p-4 shadow-cm-card">
+      <View className="mt-8 rounded-3xl bg-cm-surface/90 p-4 shadow-cm-card">
         <PlatformChipSelector
           presets={PLATFORMS}
           selectedPlatforms={selectedPlatforms}

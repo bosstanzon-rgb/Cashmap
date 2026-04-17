@@ -15,7 +15,7 @@ export function GlassCard({ children, className = "", contentClassName = "p-6" }
   const blur = Platform.OS === "ios" ? 48 : 32;
   return (
     <View
-      className={`overflow-hidden rounded-3xl border border-white/[0.12] shadow-cm-card ${className}`}
+      className={`overflow-hidden rounded-2xl shadow-cm-card ${className}`}
       style={{
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 14 },
@@ -26,7 +26,7 @@ export function GlassCard({ children, className = "", contentClassName = "p-6" }
     >
       <BlurView intensity={blur} tint="dark" style={StyleSheet.absoluteFillObject} />
       <View
-        className={`relative rounded-3xl border border-white/[0.06] bg-cm-surface/90 ${contentClassName}`}
+        className={`relative rounded-3xl border border-white/[0.06] bg-cm-surface ${contentClassName}`}
       >
         {children}
       </View>

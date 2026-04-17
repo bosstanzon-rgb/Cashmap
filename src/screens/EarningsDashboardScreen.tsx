@@ -314,7 +314,7 @@ export const EarningsDashboardScreen = () => {
             <Text className="text-[28px] font-bold text-cm-ink">{t("earnings", languageCode)}</Text>
           </View>
         </View>
-        <View className="mt-6 items-center rounded-3xl border border-white/10 bg-cm-surface/95 p-8 shadow-cm-card">
+        <View className="mt-6 items-center rounded-3xl bg-cm-surface/95 p-8 shadow-cm-card">
           <ActivityIndicator color={CM.accent} />
           <Text className="mt-4 text-[14px] text-cm-ink-secondary">Loading your earnings…</Text>
         </View>
@@ -379,18 +379,18 @@ export const EarningsDashboardScreen = () => {
       {error ? <Text className="mt-4 text-[13px] text-cm-danger">{error}</Text> : null}
 
       {/* Summary: today, week, avg R/hr */}
-      <View className="mt-6 flex-row flex-wrap gap-3">
-        <View className="min-w-[30%] flex-1 rounded-2xl border border-white/10 bg-cm-surface p-4">
+      <View className="mt-6 flex-row flex-wrap gap-4">
+        <View className="min-w-[30%] flex-1 rounded-2xl bg-cm-surface p-5">
           <Text className="text-[12px] font-semibold text-cm-ink-tertiary">Today</Text>
           <Text className="mt-2 text-[17px] font-bold leading-6 text-cm-accent">{formatMoney(todayEarnings, marketCode)}</Text>
           <Text className="mt-1 text-[12px] text-cm-ink-tertiary">{todayKm.toFixed(1)} km</Text>
         </View>
-        <View className="min-w-[30%] flex-1 rounded-2xl border border-white/10 bg-cm-surface p-4">
+        <View className="min-w-[30%] flex-1 rounded-2xl bg-cm-surface p-5">
           <Text className="text-[12px] font-semibold text-cm-ink-tertiary">This week</Text>
           <Text className="mt-2 text-[17px] font-bold leading-6 text-cm-accent">{formatMoney(weekEarnings, marketCode)}</Text>
           <Text className="mt-1 text-[12px] text-cm-ink-tertiary">{weeklyKm.toFixed(1)} km</Text>
         </View>
-        <View className="min-w-[30%] flex-1 rounded-2xl border border-white/10 bg-cm-surface p-4">
+        <View className="min-w-[30%] flex-1 rounded-2xl bg-cm-surface p-5">
           <Text className="text-[12px] font-semibold text-cm-ink-tertiary">Avg R/hr</Text>
           <Text className="mt-2 text-[17px] font-bold leading-6 text-cm-cyan">
             {avgRph !== null ? `${formatMoney(avgRph, marketCode)}/hr` : "—"}
@@ -399,14 +399,14 @@ export const EarningsDashboardScreen = () => {
         </View>
       </View>
 
-      <View className="mt-4 rounded-2xl border border-white/10 bg-cm-surface p-5">
+      <View className="mt-4 rounded-2xl bg-cm-surface p-5">
         <Text className="text-[12px] font-semibold text-cm-ink-tertiary">All-time</Text>
         <Text className="mt-2 text-xl font-bold text-cm-accent">{formatMoney(totalEarnings, marketCode)}</Text>
         <Text className="mt-1 text-[14px] text-cm-ink-tertiary">{totalKm.toFixed(0)} km tracked</Text>
       </View>
 
       {/* Victory Native weekly chart */}
-      <View className="mt-5 rounded-2xl border border-white/10 bg-cm-surface p-5">
+      <View className="mt-5 rounded-2xl bg-cm-surface p-5">
         <Text className="text-[15px] font-bold text-cm-ink">Last 7 days</Text>
         <Text className="mt-1 text-[12px] leading-5 text-cm-ink-tertiary">Green bars show daily earnings · Cyan bars show km driven (both scaled to fit)</Text>
         <WeeklyEarningsVictoryChart data={weeklyVictoryData} height={210} />
@@ -419,7 +419,7 @@ export const EarningsDashboardScreen = () => {
         </View>
       </View>
 
-      <View className="mt-5 rounded-2xl border border-white/10 bg-cm-surface p-5">
+      <View className="mt-5 rounded-2xl bg-cm-surface p-5">
         <View className="flex-row items-center justify-between">
           <Text className="text-[15px] font-bold text-cm-ink">Recent shift logs</Text>
           <Text className="text-[11px] text-cm-ink-tertiary">Tap &quot;Log today&quot; to add</Text>
@@ -437,7 +437,7 @@ export const EarningsDashboardScreen = () => {
               const topPlatforms = d.platforms.slice(0, 2);
               const extra = Math.max(0, d.platforms.length - topPlatforms.length);
               return (
-                <View key={d.date} className="rounded-2xl border border-white/10 bg-cm-raised/90 p-4 shadow-cm-inner">
+                <View key={d.date} className="rounded-2xl bg-cm-raised/90 p-4 shadow-cm-inner">
                   <View className="flex-row items-center justify-between">
                     <Text className="text-[13px] font-semibold text-cm-ink">{d.date}</Text>
                     <Text className="text-[14px] font-bold text-cm-accent">{formatMoney(d.earningsSum, marketCode)}</Text>
@@ -455,7 +455,7 @@ export const EarningsDashboardScreen = () => {
         )}
       </View>
 
-      <View className="mt-5 gap-3">
+      <View className="mt-5 gap-4">
         <PremiumPressable variant="primary" className="w-full shadow-cm-glow-sm" onPress={() => void onLogToday()}>
           <Text className={`${BTN_PRIMARY_TEXT} text-[15px]`}>Log today&apos;s earnings</Text>
         </PremiumPressable>
@@ -482,7 +482,7 @@ export const EarningsDashboardScreen = () => {
       </View>
 
       {/* Benchmarking — Pro only */}
-      <View className="mt-5 rounded-2xl border border-white/10 bg-cm-surface p-5">
+      <View className="mt-5 rounded-2xl bg-cm-surface p-5">
         <Text className="text-[15px] font-bold text-cm-ink">Benchmarks</Text>
         <Text className="mt-3 text-[14px] leading-6 text-cm-ink-secondary">
           Your avg this week:{" "}

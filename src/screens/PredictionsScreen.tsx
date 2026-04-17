@@ -138,11 +138,11 @@ export const PredictionsScreen = () => {
       </ScrollView>
 
       {drivingRank.ranked.length > 0 ? (
-        <View className="mt-5 rounded-2xl border border-white/10 bg-cm-surface p-5">
+        <View className="mt-5 rounded-2xl bg-cm-surface p-5">
           <View className="flex-col gap-1">
             <Text className="text-[17px] font-bold text-cm-ink">{t("predictionsLeaderboard", languageCode)}</Text>
             {!isPro ? (
-              <Text className="text-[11px] font-semibold text-cm-accent">{t("proFeatureLocked", languageCode)}</Text>
+              <Text className="text-[11px] font-semibold text-cm-ink-tertiary">{t("proFeatureLocked", languageCode)}</Text>
             ) : null}
           </View>
           {leaderboardRows.map((row, idx) =>
@@ -183,16 +183,16 @@ export const PredictionsScreen = () => {
         </View>
       ) : null}
 
-      <View className="mt-5 rounded-2xl border border-white/10 bg-cm-surface p-5">
+      <View className="mt-5 rounded-2xl bg-cm-surface p-5">
         <View className="flex-col gap-1">
           <Text className="text-[17px] font-bold text-cm-ink">{t("topNearbyZones", languageCode)}</Text>
           {!isPro ? (
-            <Text className="text-[11px] font-semibold text-cm-accent">{t("proFeatureLocked", languageCode)}</Text>
+            <Text className="text-[11px] font-semibold text-cm-ink-tertiary">{t("proFeatureLocked", languageCode)}</Text>
           ) : null}
         </View>
         {nearbyRows.map((zone, idx) =>
           isPro ? (
-            <View key={zone.id} className="mt-3 rounded-xl border border-white/10 bg-cm-raised px-3 py-3">
+            <View key={zone.id} className="mt-3 rounded-xl bg-cm-raised px-3 py-3">
               <View className="flex-row items-start justify-between gap-2">
                 <Text className="flex-1 text-[13px] font-semibold text-cm-ink" numberOfLines={2}>
                   {idx + 1}. {formatPingSegmentLabel(zone.platform)} · {zone.suburb}
@@ -215,7 +215,7 @@ export const PredictionsScreen = () => {
       {isPro ? (
         <View className="mt-5 mb-8 gap-4">
           {zoneCards.map((zone) => (
-            <View key={zone.id} className="rounded-3xl border border-white/10 bg-cm-surface/95 p-5 shadow-cm-inner">
+            <View key={zone.id} className="rounded-3xl bg-cm-surface/95 p-5 shadow-cm-inner">
               <Text className="text-[15px] font-semibold leading-6 text-cm-ink">
                 {formatMoney(zone.predictedMinRph, marketCode)}–{formatMoney(zone.predictedMaxRph, marketCode)}/hr · {zone.suburb}
               </Text>

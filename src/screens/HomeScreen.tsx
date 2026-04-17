@@ -607,7 +607,7 @@ export const HomeScreen = () => {
             bottom: 0,
             left: 0,
             right: 0,
-            backgroundColor: CM.surface,
+            backgroundColor: "#1B1F23",
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
             zIndex: 10,
@@ -621,7 +621,7 @@ export const HomeScreen = () => {
         >
           {/* Drag handle */}
           <View style={{ alignItems: "center", paddingTop: 12, paddingBottom: 4 }}>
-            <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.18)" }} />
+            <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.12)" }} />
           </View>
 
           {/* Sheet scroll content */}
@@ -635,10 +635,12 @@ export const HomeScreen = () => {
             <OfflineBanner />
 
             {/* ── Platform tabs — horizontally scrollable ── */}
-            <ScrollView
+            <GHScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              style={{ marginBottom: 16 }}
+              nestedScrollEnabled
+              directionalLockEnabled
+              style={{ marginBottom: 16, flexGrow: 0 }}
               contentContainerStyle={{ gap: 8, paddingVertical: 2 }}
             >
               {defaultPrimary.map((platform) => (
@@ -658,7 +660,7 @@ export const HomeScreen = () => {
                   </Text>
                 </PremiumPressable>
               ))}
-            </ScrollView>
+            </GHScrollView>
 
             {/* ── I'm Working button ── */}
             <PremiumPressable
@@ -686,7 +688,7 @@ export const HomeScreen = () => {
 
             {/* ── Best zone (while working) ── */}
             {bestNow && isWorking ? (
-              <View className="mb-4 rounded-2xl border border-cm-accent/25 bg-cm-accent-soft p-4">
+              <View className="mb-4 rounded-2xl bg-cm-accent-soft p-5">
                 <Text className="text-[11px] font-bold uppercase tracking-widest text-cm-accent">Best zone right now</Text>
                 <View className="mt-2 flex-row items-center justify-between">
                   <View className="flex-1">
@@ -706,7 +708,7 @@ export const HomeScreen = () => {
 
             {/* ── Best platforms leaderboard ── */}
             {drivingRank.ranked.length > 0 ? (
-              <View className="mb-4 rounded-2xl border border-white/10 bg-cm-raised p-4">
+              <View className="mb-4 rounded-2xl bg-cm-raised p-5">
                 <Text className="mb-3 text-[11px] font-bold uppercase tracking-widest text-cm-accent">Best platforms right now</Text>
                 {drivingRank.ranked.slice(0, 3).map((row, idx) => (
                   <View key={row.key} className={`flex-row items-center gap-3 ${idx > 0 ? "mt-3 border-t border-white/[0.06] pt-3" : ""}`}>
@@ -738,7 +740,7 @@ export const HomeScreen = () => {
             {!isPro ? (
               <PremiumPressable
                 variant="none"
-                className="mb-4 w-full rounded-2xl border border-cm-cyan/35 bg-cm-cyan-dim px-5 py-4"
+                className="mb-4 w-full rounded-2xl bg-cm-raised px-5 py-5"
                 onPress={() => openUpgradeModal()}
               >
                 <Text className="text-[15px] font-bold text-cm-ink">{t("launchGiveawayBannerHeadline", languageCode)}</Text>
@@ -750,7 +752,7 @@ export const HomeScreen = () => {
             {/* ── Smart pick ── */}
             {drivingRank.ranked.length >= 1 && drivingRank.current && drivingRank.ranked[0] && drivingRank.ranked[0].key !== drivingRank.current.key && drivingRank.ranked[0].estMidRph >= drivingRank.current.estMidRph * 1.08 ? (
               isPro ? (
-                <View className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-950/30 p-4">
+                <View className="mb-4 rounded-2xl bg-amber-950/40 p-5">
                   <Text className="text-[11px] font-bold uppercase tracking-wider text-amber-200/95">{t("smartPickTitle", languageCode)}</Text>
                   <Text className="mt-2 text-[13px] leading-5 text-amber-50/95">
                     {t("smartPickBody", languageCode, { winner: formatDrivingOptionLabel(drivingRank.ranked[0]), current: formatDrivingOptionLabel(drivingRank.current) })}
@@ -763,7 +765,7 @@ export const HomeScreen = () => {
             ) : null}
 
             {/* ── Mileage stats ── */}
-            <View className="mb-4 rounded-2xl border border-white/10 bg-cm-raised/80 p-4">
+            <View className="mb-4 rounded-2xl bg-cm-raised/80 p-4">
               <Text className="mb-3 text-[11px] font-bold uppercase tracking-widest text-cm-ink-tertiary">Mileage tracked</Text>
               <View className="flex-row">
                 <View className="flex-1 items-center">
@@ -840,23 +842,25 @@ export const HomeScreen = () => {
               <TouchableOpacity
                 onPress={() => { openGoogleMapsNav(); setShowNavOptions(false); }}
                 style={{
-                  backgroundColor: "#00FF9D",
-                  borderRadius: 999,
+                  backgroundColor: "#1B1F23",
+                  borderRadius: 12,
+                  borderLeftWidth: 3,
+                  borderLeftColor: "#00FF9D",
                   paddingVertical: 12,
-                  paddingHorizontal: 20,
+                  paddingHorizontal: 16,
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 8,
-                  shadowColor: "#00FF9D",
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.7,
-                  shadowRadius: 12,
-                  elevation: 10,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.4,
+                  shadowRadius: 8,
+                  elevation: 8,
                 }}
               >
                 <Text style={{ fontSize: 16 }}>🗺️</Text>
-                <Text style={{ color: "#0A0A0A", fontSize: 14, fontWeight: "900" }}>Go</Text>
-                <Text style={{ color: "rgba(0,0,0,0.5)", fontSize: 11 }}>→ {bestZoneCoords.suburb}</Text>
+                <Text style={{ color: "#00FF9D", fontSize: 14, fontWeight: "800" }}>Go</Text>
+                <Text style={{ color: "#A0AEC0", fontSize: 11 }}>→ {bestZoneCoords.suburb}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setShowNavOptions(false)} style={{ paddingVertical: 4, paddingHorizontal: 8 }}>
                 <Text style={{ color: "#666", fontSize: 11 }}>✕ Cancel</Text>
@@ -881,8 +885,8 @@ export const HomeScreen = () => {
               }}
             >
               <Text style={{ fontSize: 16 }}>🔥</Text>
-              <Text style={{ color: "#0A0A0A", fontSize: 15, fontWeight: "900", letterSpacing: 0.2 }}>Go</Text>
-              <Text style={{ color: "rgba(0,0,0,0.45)", fontSize: 11 }}>→ {bestZoneCoords.suburb}</Text>
+              <Text style={{ color: "#00FF9D", fontSize: 14, fontWeight: "800" }}>Go</Text>
+              <Text style={{ color: "#A0AEC0", fontSize: 11 }}>→ {bestZoneCoords.suburb}</Text>
             </TouchableOpacity>
           )}
         </Animated.View>
@@ -897,7 +901,7 @@ export const HomeScreen = () => {
               <Text className="text-[11px] font-semibold uppercase tracking-wide text-cm-accent">End of shift</Text>
               <Text className="text-[22px] font-bold tracking-tight text-cm-ink">{t("dailyShiftSummary", languageCode)}</Text>
               <Text className="mt-2 text-[13px] leading-5 text-cm-ink-secondary">Log your earnings to improve zone predictions for all drivers.</Text>
-              <TextInput value={earnings} onChangeText={setEarnings} placeholder={`${t("totalEarnings", languageCode)} (${market.currency} ___)`} keyboardType="numeric" placeholderTextColor={INPUT_PLACEHOLDER} className="mt-4 rounded-3xl border border-white/10 bg-cm-raised/90 px-4 py-3.5 text-[16px] text-cm-ink" />
+              <TextInput value={earnings} onChangeText={setEarnings} placeholder={`${t("totalEarnings", languageCode)} (${market.currency} ___)`} keyboardType="numeric" placeholderTextColor={INPUT_PLACEHOLDER} className="mt-4 rounded-3xl bg-cm-raised/90 px-4 py-3.5 text-[16px] text-cm-ink" />
               <View className="mt-4 flex-row flex-wrap gap-2">
                 {selectedPlatforms.map((platform) => {
                   const selected = summaryPlatforms.includes(platform);
@@ -914,7 +918,7 @@ export const HomeScreen = () => {
               <View className="mt-4">
                 <Text className="mb-2 text-[13px] text-cm-ink-secondary">{t("approxDeliveries", languageCode)}</Text>
                 <View className="flex-row items-center gap-3">
-                  <TextInput value={deliveries > 0 ? String(deliveries) : ""} onChangeText={(v) => { const n = parseInt(v, 10); setDeliveries(Number.isFinite(n) && n >= 0 ? Math.min(200, n) : 0); }} keyboardType="numeric" placeholder="0" placeholderTextColor={INPUT_PLACEHOLDER} className="flex-1 rounded-xl border border-white/10 bg-cm-raised px-4 py-3 text-[18px] font-bold text-cm-ink" />
+                  <TextInput value={deliveries > 0 ? String(deliveries) : ""} onChangeText={(v) => { const n = parseInt(v, 10); setDeliveries(Number.isFinite(n) && n >= 0 ? Math.min(200, n) : 0); }} keyboardType="numeric" placeholder="0" placeholderTextColor={INPUT_PLACEHOLDER} className="flex-1 rounded-xl bg-cm-raised px-4 py-3 text-[18px] font-bold text-cm-ink" />
                   <PremiumPressable className={BTN_ICON} onPress={() => setDeliveries((d) => Math.max(0, d - 1))}><Text className="text-xl font-semibold text-cm-ink">−</Text></PremiumPressable>
                   <PremiumPressable className={BTN_ICON} onPress={() => setDeliveries((d) => Math.min(200, d + 1))}><Text className="text-xl font-semibold text-cm-ink">+</Text></PremiumPressable>
                 </View>

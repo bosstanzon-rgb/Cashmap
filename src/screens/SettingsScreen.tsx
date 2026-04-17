@@ -40,7 +40,7 @@ const ToggleRow = ({
   enabledText: string;
   disabledText: string;
 }) => (
-  <View className="rounded-2xl border border-white/10 bg-cm-raised p-4">
+  <View className="rounded-2xl bg-cm-raised p-5">
     <View className="flex-row items-center justify-between gap-3">
       <Text className="min-w-0 flex-1 text-[15px] leading-6 text-cm-ink">{label}</Text>
       <PremiumPressable
@@ -160,7 +160,7 @@ export const SettingsScreen = () => {
           <Text className="text-center text-[16px] font-bold text-cm-ink-secondary">{t("legalPrivacyNav", languageCode)}</Text>
         </PremiumPressable>
       </GlassCard>
-      <View className="mb-5 rounded-2xl border border-white/10 bg-cm-surface p-5">
+      <View className="mb-5 rounded-2xl bg-cm-surface p-5">
         <Text className="text-[15px] font-bold text-cm-ink">Notifications</Text>
         <Text className="mt-1 text-[13px] leading-5 text-cm-ink-tertiary">
           Zone alerts and weekly recaps need notification permission. If alerts aren't arriving, tap below to check.
@@ -194,7 +194,7 @@ export const SettingsScreen = () => {
           </Text>
         </View>
       )}
-      <View className="mb-5 rounded-2xl border border-white/10 bg-cm-surface p-5">
+      <View className="mb-5 rounded-2xl bg-cm-surface p-5">
         <Text className="text-[14px] font-semibold text-cm-ink">{t("homeRegion", languageCode)}</Text>
         <View className="mt-4 flex-row flex-wrap gap-2">
           {MARKET_CODES.map((code) => {
@@ -215,7 +215,7 @@ export const SettingsScreen = () => {
           })}
         </View>
       </View>
-      <View className="mb-5 rounded-2xl border border-white/10 bg-cm-surface p-5">
+      <View className="mb-5 rounded-2xl bg-cm-surface p-5">
         <Text className="text-[14px] font-semibold text-cm-ink">{t("manageSubscription", languageCode)}</Text>
         <Text className="mt-2 text-[12px] text-cm-ink-tertiary">{t("proTeaserLine", languageCode)}</Text>
         <Text className="mt-3 text-[13px] leading-5 text-cm-ink-secondary">
@@ -314,7 +314,7 @@ export const SettingsScreen = () => {
         </View>
       ) : null}
       <View className="gap-4">
-        <View className="rounded-2xl border border-white/10 bg-cm-surface p-5">
+        <View className="rounded-2xl bg-cm-surface p-5">
           <Text className="text-[14px] font-semibold text-cm-ink">{t("language", languageCode)}</Text>
           <View className="mt-4 flex-row flex-wrap gap-2">
             {COMMON_LANGUAGE_OPTIONS.map((item) => {
@@ -339,7 +339,7 @@ export const SettingsScreen = () => {
               onChangeText={setCustomLanguage}
               placeholder={t("customLanguagePlaceholder", languageCode)}
               placeholderTextColor={INPUT_PLACEHOLDER}
-              className="flex-1 rounded-xl border border-white/10 bg-cm-raised px-3 py-3 text-[15px] text-cm-ink"
+              className="flex-1 rounded-xl bg-cm-raised px-3 py-3 text-[15px] text-cm-ink"
             />
             <PremiumPressable
               variant="primary"
@@ -358,7 +358,7 @@ export const SettingsScreen = () => {
             {t("customLanguageHint", languageCode)}
           </Text>
         </View>
-        <View className="rounded-2xl border border-white/10 bg-cm-surface p-5">
+        <View className="rounded-2xl bg-cm-surface p-5">
           <PlatformChipSelector
             presets={market.allPlatforms}
             selectedPlatforms={selectedPlatforms}
@@ -374,7 +374,7 @@ export const SettingsScreen = () => {
               const qualified = q?.length ? q : tiers[0] ? [tiers[0].id] : [];
               const active = rideHailActiveTierId[p] ?? qualified[0];
               return (
-                <View key={p} className="rounded-2xl border border-white/10 bg-cm-surface p-5">
+                <View key={p} className="rounded-2xl bg-cm-surface p-5">
                   <Text className="text-[14px] text-cm-ink-secondary">
                     {t("rideHailServiceTypes", languageCode)} — {p}
                   </Text>
@@ -480,7 +480,7 @@ export const SettingsScreen = () => {
         <ToggleRow label={t("weeklyRecapNotifications", languageCode)} value={weeklyRecapNotificationsEnabled} onPress={() => setWeeklyRecapNotificationsEnabled(!weeklyRecapNotificationsEnabled)} enabledText={t("enabled", languageCode)} disabledText={t("disabled", languageCode)} />
         <ToggleRow label={t("autoPause", languageCode)} value={autoPauseAfterInactivity} onPress={() => setAutoPauseAfterInactivity(!autoPauseAfterInactivity)} enabledText={t("enabled", languageCode)} disabledText={t("disabled", languageCode)} />
       </View>
-      <View className="mt-5 rounded-2xl border border-white/10 bg-cm-surface/90 p-5">
+      <View className="mt-5 rounded-2xl bg-cm-surface/90 p-5">
         <LegalDisclaimer compact showPolicyLinks />
       </View>
       <PremiumPressable
@@ -504,7 +504,7 @@ export const SettingsScreen = () => {
       <Text className="mt-5 text-[12px] leading-5 text-cm-ink-tertiary">
         {t("locationAccuracyHint", languageCode)}
       </Text>
-      <View className="mt-6 rounded-2xl border border-white/10 bg-cm-raised/80 px-4 py-3">
+      <View className="mt-6 rounded-2xl bg-cm-raised/80 px-4 py-3">
         <Text className="text-center text-[11px] font-bold uppercase tracking-widest text-cm-accent">CashMap</Text>
         <Text className="mt-1 text-center text-[15px] font-semibold text-cm-ink">Version {appVersion}</Text>
         <Text className="mt-1 text-center text-[11px] text-cm-ink-tertiary">Gauteng-focused MVP · estimates only</Text>

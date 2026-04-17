@@ -52,7 +52,7 @@ export const LaunchCodeSection = ({ onLifetimeSuccess }: Props) => {
   };
 
   return (
-    <View className="rounded-3xl border border-white/10 bg-cm-surface/95 p-4 shadow-cm-inner">
+    <View className="rounded-3xl bg-cm-surface/95 p-4 shadow-cm-inner">
       <Text className="text-sm font-medium text-cm-ink-secondary">{t("launchCodeLabel", languageCode)}</Text>
       <TextInput
         value={code}
@@ -62,7 +62,7 @@ export const LaunchCodeSection = ({ onLifetimeSuccess }: Props) => {
         autoCapitalize="characters"
         autoCorrect={false}
         editable={!busy}
-        className="mt-2 rounded-2xl border border-white/10 bg-cm-raised px-3 py-3 text-[15px] text-cm-ink shadow-cm-inner"
+        className="mt-2 rounded-2xl bg-cm-raised px-3 py-3 text-[15px] text-cm-ink shadow-cm-inner"
       />
       <PremiumPressable
         variant={busy ? "none" : "primary"}

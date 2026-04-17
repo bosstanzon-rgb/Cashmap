@@ -1,16 +1,19 @@
 /**
- * CashMap premium dark palette — high-contrast, readable, 2026 fintech.
+ * CashMap design tokens — refined dark driver UI.
+ * Pass 1: elevation through color, consistent radius, readable typography.
  */
 export const CM = {
-  canvas: "#0F0F0F",
-  surface: "#1A1A1A",
-  raised: "#242424",
-  accent: "#00FF9D",
-  cyan: "#00E5FF",
-  inkSecondary: "#E0E0E0",
-  inkTertiary: "#AAAAAA",
-  onAccent: "#0A0A0A",
+  canvas:       "#0B0E11",
+  surface:      "#1B1F23",
+  raised:       "#2C3136",
+  muted:        "#363B42",
+  accent:       "#00FF9D",
+  cyan:         "#00E5FF",
+  inkSecondary: "#A0AEC0",
+  inkTertiary:  "#6B7280",
+  onAccent:     "#0A0A0A",
+  warn:         "#F59E0B",
+  danger:       "#F87171",
 } as const;
 
-/** Inputs — visible on raised fields without looking muddy */
-export const INPUT_PLACEHOLDER = "#888888";
+export const INPUT_PLACEHOLDER = "#6B7280";

@@ -183,7 +183,7 @@ export const PaywallScreen = () => {
       </View>
       <Text className="mt-4 text-[28px] font-bold text-cm-ink">{t("unlockCashMapProTitle", languageCode)}</Text>
       <Text className="mt-2 text-[15px] leading-6 text-cm-ink-secondary">Everything you need to earn smarter as a gig driver in Gauteng.</Text>
-      <View className="mt-5 rounded-2xl border border-white/10 bg-cm-surface p-4">
+      <View className="mt-5 rounded-2xl bg-cm-surface p-5">
         <Text className="mb-3 text-[13px] font-bold uppercase tracking-wide text-cm-ink-tertiary">What you get with Pro</Text>
         {[
           "Live driver density — see exactly how many drivers are in each zone",
@@ -272,7 +272,7 @@ export const PaywallScreen = () => {
         )}
       </PremiumPressable>
 
-      <View className="mt-8 rounded-2xl border border-white/10 bg-cm-surface p-5">
+      <View className="mt-8 rounded-2xl bg-cm-surface p-5">
         <Text className="text-[11px] font-semibold uppercase tracking-wide text-cm-ink-tertiary">
           {t("manageSubscription", languageCode)}
         </Text>
