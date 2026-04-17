@@ -328,21 +328,18 @@ export const EarningsDashboardScreen = () => {
       showsVerticalScrollIndicator={false}
       nestedScrollEnabled={Platform.OS === "android"}
     >
-      <View className="flex-row items-start justify-between">
+      <View className="flex-row items-center justify-between mb-1">
         <View className="flex-1">
           <Text className="text-[11px] font-bold uppercase tracking-widest text-cm-accent">CashMap</Text>
           <Text className="text-[28px] font-bold text-cm-ink">{t("earnings", languageCode)}</Text>
-          <Text className="mt-1 text-[12px] text-cm-ink-tertiary">v{appVersion}</Text>
-        </View>
-        <View className="flex-1 mt-2">
-          <Text className="text-[13px] leading-5 text-cm-ink-secondary">Your earnings, km tracked, and shift history — all in one place. Export your km log for tax deductions anytime.</Text>
+          <Text className="mt-0.5 text-[12px] text-cm-ink-tertiary">v{appVersion}</Text>
         </View>
         <PremiumPressable
           variant={refreshing ? "none" : "secondaryAccent"}
           className={
             refreshing
-              ? "min-h-14 justify-center rounded-full border-[1.5px] border-white/10 bg-cm-muted px-6 py-3"
-              : "px-6"
+              ? "min-h-10 justify-center rounded-xl bg-cm-raised px-5 py-2"
+              : "min-h-10 justify-center rounded-xl bg-cm-raised px-5 py-2"
           }
           disabled={refreshing}
           onPress={() => void onRefresh()}
@@ -350,10 +347,11 @@ export const EarningsDashboardScreen = () => {
           {refreshing ? (
             <ActivityIndicator color={CM.accent} size="small" />
           ) : (
-            <Text className="text-center text-[13px] font-bold uppercase tracking-wide text-cm-accent">Refresh</Text>
+            <Text className="text-center text-[13px] font-bold text-cm-accent">↺  Refresh</Text>
           )}
         </PremiumPressable>
       </View>
+      <Text className="mb-2 text-[13px] leading-5 text-cm-ink-secondary">Your earnings, km tracked, and shift history — all in one place. Export your km log for tax deductions anytime.</Text>
       
       <OfflineBanner />
       <MvpDisclaimerBanner className="mt-4" />
