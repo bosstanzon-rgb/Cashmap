@@ -140,6 +140,12 @@ export const HomeScreen = () => {
     pointerEvents: sheetY.value > SHEET_HALF ? "auto" as const : "none" as const,
   }));
 
+  // GO button fades out as sheet rises above peek — only visible on map
+  const goButtonStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(sheetY.value, [SHEET_PEEK, SHEET_HALF], [1, 0], Extrapolation.CLAMP),
+    pointerEvents: sheetY.value < SHEET_HALF * 0.9 ? "auto" as const : "none" as const,
+  }));
+
   const {
     isWorking, setWorking, setTracking, selectedPlatforms, userId,
     marketCode, zoneAlertsEnabled, weatherTipsEnabled, dailyShiftPromptEnabled,
@@ -159,7 +165,7 @@ export const HomeScreen = () => {
       Constants.expoConfig?.android?.config?.googleMaps?.apiKey ||
       process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
   );
-  const defaultPrimary = selectedPlatforms.length > 0 ? selectedPlatforms : market.primaryPlatforms;
+  const defaultPrimary = selectedPlatforms.length > 0 ? selectedPlatforms : market.primaryPlatforms.slice(0, 3);
   const fakePlatformScores = [
     { platform: defaultPrimary[0] ?? "Platform A", suburb: market.defaultSuburbs[0] ?? market.city, score: 9.2, est: 320 },
     { platform: defaultPrimary[1] ?? "Platform B", suburb: market.defaultSuburbs[1] ?? market.city, score: 8.1, est: 280 },
@@ -800,109 +806,86 @@ export const HomeScreen = () => {
         </Text>
       </PremiumPressable>
 
-      {/* ── Guide Me There button — shows when there is a hot zone ── */}
+      {/* ── GO button — compact, fades out when sheet is pulled up ── */}
       {bestZoneCoords ? (
-        <View
-          style={{
+        <Animated.View
+          style={[{
             position: "absolute",
-            bottom: SHEET_PEEK + 72,
+            bottom: SHEET_PEEK + 16,
             left: 16,
-            right: 72,
             zIndex: 20,
-          }}
+          }, goButtonStyle]}
         >
           {showNavOptions ? (
-            <View style={{ gap: 8 }}>
-              {/* Waze option */}
+            <View style={{ gap: 8, alignItems: "flex-start" }}>
+              {/* Waze */}
               <TouchableOpacity
                 onPress={() => { openWazeNav(); setShowNavOptions(false); }}
                 style={{
                   backgroundColor: "rgba(10,10,10,0.92)",
                   borderRadius: 999,
-                  paddingVertical: 12,
-                  paddingHorizontal: 20,
+                  paddingVertical: 10,
+                  paddingHorizontal: 16,
                   borderWidth: 1,
-                  borderColor: "rgba(0,229,255,0.4)",
+                  borderColor: "rgba(0,229,255,0.45)",
                   flexDirection: "row",
                   alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
+                  gap: 7,
                 }}
               >
-                <Text style={{ fontSize: 16 }}>🔵</Text>
-                <Text style={{ color: "#00E5FF", fontSize: 14, fontWeight: "700" }}>
-                  Open in Waze
-                </Text>
+                <Text style={{ fontSize: 14 }}>🔵</Text>
+                <Text style={{ color: "#00E5FF", fontSize: 13, fontWeight: "700" }}>Waze</Text>
               </TouchableOpacity>
-              {/* Google Maps option */}
+              {/* Google Maps */}
               <TouchableOpacity
                 onPress={() => { openGoogleMapsNav(); setShowNavOptions(false); }}
                 style={{
-                  backgroundColor: "rgba(0,255,157,1)",
+                  backgroundColor: "#00FF9D",
                   borderRadius: 999,
-                  paddingVertical: 16,
-                  paddingHorizontal: 24,
+                  paddingVertical: 12,
+                  paddingHorizontal: 20,
                   flexDirection: "row",
                   alignItems: "center",
-                  justifyContent: "center",
-                  gap: 10,
+                  gap: 8,
                   shadowColor: "#00FF9D",
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: 0.6,
-                  shadowRadius: 16,
-                  elevation: 12,
+                  shadowOpacity: 0.7,
+                  shadowRadius: 12,
+                  elevation: 10,
                 }}
               >
-                <Text style={{ fontSize: 18 }}>🗺️</Text>
-                <View>
-                  <Text style={{ color: "#0A0A0A", fontSize: 16, fontWeight: "900", letterSpacing: 0.3 }}>
-                    Guide Me There
-                  </Text>
-                  <Text style={{ color: "rgba(0,0,0,0.6)", fontSize: 11, fontWeight: "600" }}>
-                    → {bestZoneCoords.suburb}
-                  </Text>
-                </View>
+                <Text style={{ fontSize: 16 }}>🗺️</Text>
+                <Text style={{ color: "#0A0A0A", fontSize: 14, fontWeight: "900" }}>Go</Text>
+                <Text style={{ color: "rgba(0,0,0,0.5)", fontSize: 11 }}>→ {bestZoneCoords.suburb}</Text>
               </TouchableOpacity>
-              {/* Dismiss */}
-              <TouchableOpacity
-                onPress={() => setShowNavOptions(false)}
-                style={{ alignItems: "center", paddingVertical: 4 }}
-              >
-                <Text style={{ color: "#666", fontSize: 12 }}>Cancel</Text>
+              <TouchableOpacity onPress={() => setShowNavOptions(false)} style={{ paddingVertical: 4, paddingHorizontal: 8 }}>
+                <Text style={{ color: "#666", fontSize: 11 }}>✕ Cancel</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <TouchableOpacity
               onPress={() => setShowNavOptions(true)}
               style={{
-                backgroundColor: "rgba(0,255,157,1)",
+                backgroundColor: "#00FF9D",
                 borderRadius: 999,
-                paddingVertical: 16,
-                paddingHorizontal: 24,
+                paddingVertical: 11,
+                paddingHorizontal: 18,
                 flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "center",
-                gap: 10,
+                gap: 7,
                 shadowColor: "#00FF9D",
                 shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.55,
-                shadowRadius: 20,
-                elevation: 12,
+                shadowOpacity: 0.65,
+                shadowRadius: 14,
+                elevation: 10,
               }}
             >
-              <Text style={{ fontSize: 20 }}>🔥</Text>
-              <View>
-                <Text style={{ color: "#0A0A0A", fontSize: 16, fontWeight: "900", letterSpacing: 0.3 }}>
-                  Guide Me There
-                </Text>
-                <Text style={{ color: "rgba(0,0,0,0.55)", fontSize: 11, fontWeight: "600" }}>
-                  Hot zone → {bestZoneCoords.suburb}
-                </Text>
-              </View>
-              <Text style={{ color: "rgba(0,0,0,0.4)", fontSize: 18, marginLeft: 4 }}>›</Text>
+              <Text style={{ fontSize: 16 }}>🔥</Text>
+              <Text style={{ color: "#0A0A0A", fontSize: 15, fontWeight: "900", letterSpacing: 0.2 }}>Go</Text>
+              <Text style={{ color: "rgba(0,0,0,0.45)", fontSize: 11 }}>→ {bestZoneCoords.suburb}</Text>
             </TouchableOpacity>
           )}
-        </View>
+        </Animated.View>
       ) : null}
 
       {/* ── Shift logger modal ── */}

@@ -154,10 +154,10 @@ export const PredictionsScreen = () => {
                 }`}
               >
                 <View className="flex-row items-center justify-between">
-                  <Text className="text-[13px] font-semibold leading-5 text-cm-ink">
+                  <Text className="flex-1 text-[13px] font-semibold leading-5 text-cm-ink" numberOfLines={2}>
                     {idx + 1}. {formatDrivingOptionLabel(row)}
                   </Text>
-                  <Text className="text-[15px] font-bold text-cm-accent">~{formatMoney(row.estMidRph, marketCode)}/hr</Text>
+                  <Text className="shrink-0 text-[13px] font-bold text-cm-accent">~{formatMoney(row.estMidRph, marketCode)}/hr</Text>
                 </View>
                 <Text className="mt-1 text-[12px] leading-5 text-cm-ink-secondary">
                   {row.competitionLabel} · {row.driverCount || "—"} drivers nearby
@@ -193,11 +193,11 @@ export const PredictionsScreen = () => {
         {nearbyRows.map((zone, idx) =>
           isPro ? (
             <View key={zone.id} className="mt-3 rounded-xl border border-white/10 bg-cm-raised px-3 py-3">
-              <View className="flex-row items-center justify-between">
-                <Text className="text-[13px] font-semibold text-cm-ink">
+              <View className="flex-row items-start justify-between gap-2">
+                <Text className="flex-1 text-[13px] font-semibold text-cm-ink" numberOfLines={2}>
                   {idx + 1}. {formatPingSegmentLabel(zone.platform)} · {zone.suburb}
                 </Text>
-                <Text className="text-[14px] font-bold text-cm-accent">
+                <Text className="shrink-0 text-[13px] font-bold text-cm-accent">
                   {formatMoney(zone.predictedMinRph, marketCode)}–{formatMoney(zone.predictedMaxRph, marketCode)}/hr
                 </Text>
               </View>
@@ -216,9 +216,8 @@ export const PredictionsScreen = () => {
         <View className="mt-5 mb-8 gap-4">
           {zoneCards.map((zone) => (
             <View key={zone.id} className="rounded-3xl border border-white/10 bg-cm-surface/95 p-5 shadow-cm-inner">
-              <Text className="text-[16px] font-semibold leading-6 text-cm-ink">
-                {t("predictedIn", languageCode)}: {formatMoney(zone.predictedMinRph, marketCode)}-
-                {formatMoney(zone.predictedMaxRph, marketCode)}/hr in {zone.suburb}
+              <Text className="text-[15px] font-semibold leading-6 text-cm-ink">
+                {formatMoney(zone.predictedMinRph, marketCode)}–{formatMoney(zone.predictedMaxRph, marketCode)}/hr · {zone.suburb}
               </Text>
               <Text className="mt-2 text-[13px] leading-5 text-cm-ink-secondary">{zone.why}</Text>
             </View>
