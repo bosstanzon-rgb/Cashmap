@@ -43,7 +43,7 @@ export const ProfileSetupScreen = () => {
       hasLocationConsent: consent,
       marketCode,
     });
-    setShareAnonymousHeatmapData(false);
+    setShareAnonymousHeatmapData(consent);
     try {
       await Notifications.requestPermissionsAsync();
     } catch {
